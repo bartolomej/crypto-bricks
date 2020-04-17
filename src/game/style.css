@@ -1,0 +1,44 @@
+#game-container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.bricks-wrapper {
+    display: flex;
+    height: 50%;
+    flex-direction: column;
+}
+
+.bricks-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.brick {
+    flex: 1;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.brick img {
+    width: 100%;
+    height: 100%;
+}
+
+.player {
+    width: 100px;
+    height: 50px;
+    background: brown;
+    position: absolute;
+    bottom: 0;
+}
+
+.bullet {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: black;
+    position: absolute;
+}

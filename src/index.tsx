@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import Game from "./Game";
+import Main from "./Main";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Game rows={10} columns={20}/>
+   <Main/>
   </React.StrictMode>,
   document.getElementById('root')
 );
