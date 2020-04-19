@@ -6,9 +6,10 @@ export default function () {
 
   return (
     <Container>
-      <GameContainer>
-        <Game/>
-      </GameContainer>
+      <Game
+        width={window.innerWidth}
+        height={window.innerHeight}
+      />
     </Container>
   )
 }
@@ -20,10 +21,3 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-const GameContainer = styled.div`
-  width: 50%;
-  height: 50%;
-  border: 2px solid black;
-`;
-

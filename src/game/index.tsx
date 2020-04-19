@@ -3,13 +3,19 @@ import './style.css';
 import Main from "./Main";
 
 
-export default function () {
+type Props = {
+  width: number;
+  height: number;
+}
+
+export default function ({ height, width} : Props) {
   const ref: any = React.useRef(null);
 
   useEffect(() => {
-    const main = new Main(5, 10);
+    ref.current.style.width = `${width}px`
+    ref.current.style.height = `${height}px`
+    const main = new Main(ref.current, 1, 10);
     main.initialize();
-    main.render(ref.current);
   }, [ref]);
 
 
