@@ -14,7 +14,7 @@ export default function ({ height, width} : Props) {
   useEffect(() => {
     ref.current.style.width = `${width}px`
     ref.current.style.height = `${height}px`
-    const main = new Main(ref.current, 1, 10);
+    const main = new Main(ref.current, 2, 10);
     main.initialize();
   }, [ref]);
 

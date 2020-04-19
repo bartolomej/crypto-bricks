@@ -1,13 +1,24 @@
 import Vector from "../base/Vector";
 import Circle from "../base/Circle";
 
+enum BrickStatus {
+  ACTIVE,
+  HIT
+}
+
 export default class Brick extends Circle {
 
   private domElement: HTMLElement | null;
+  private status: BrickStatus;
 
   constructor (radius: number, position: Vector) {
     super(radius, position);
     this.domElement = null;
+    this.status = BrickStatus.ACTIVE;
+  }
+
+  isActive () {
+    return this.status === BrickStatus.ACTIVE;
   }
 
   render () {
@@ -23,6 +34,12 @@ export default class Brick extends Circle {
     container.appendChild(image);
     this.domElement = container;
     return container;
+  }
+
+  hit () {
+    this.status = BrickStatus.HIT;
+    // @ts-ignore
+    this.domElement.style.visibility = 'hidden';
   }
 
   update () {

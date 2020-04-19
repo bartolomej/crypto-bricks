@@ -11,10 +11,10 @@ enum GameState {
 
 export default class Main {
 
-  private animation: number|null;
-  private player: Player|null;
-  private bullet: Bullet|null;
-  private bricks: Array<Array<Brick>>|null;
+  private animation: number | null;
+  private player: Player | null;
+  private bullet: Bullet | null;
+  private bricks: Array<Array<Brick>> | null;
   private readonly rows: number;
   private readonly columns: number;
   private readonly container: HTMLElement;
@@ -52,10 +52,10 @@ export default class Main {
       const row = [];
       for (let j = 0; j < this.columns; j++) {
         const position = new Vector(
-          ((brickWidth*j) + brickWidth/2),
-          this.getDimensions().y - ((brickWidth*i) + brickWidth/2)
+          ((brickWidth * j) + brickWidth / 2),
+          this.getDimensions().y - ((brickWidth * i) + brickWidth / 2)
         );
-        row.push(new Brick(brickWidth/2, position));
+        row.push(new Brick(brickWidth / 2, position));
       }
       bricks.push(row);
     }
@@ -71,17 +71,18 @@ export default class Main {
     if (this.bullet) {
       this.bullet.removeDom();
     }
-    this.player = new Player(150, this.getDimensions().x / 2);
+    this.player = new Player(200, this.getDimensions().x / 2);
     this.bullet = new Bullet(bulletRadius, new Vector(this.player.position, this.player.height + bulletRadius));
     this.player.render(this.container);
     this.bullet.render(this.container);
   }
 
-  startGame() {
+  startGame () {
     if (!(this.bricks && this.player && this.bullet)) {
       throw new Error('Not initialized');
     }
     this.bullet.velocity.y = 8;
+    this.bullet.velocity.angle = (Math.random() * Math.PI / 2) + 1;
     this.state = GameState.STARTED;
   }
 
@@ -120,25 +121,32 @@ export default class Main {
       throw new Error('Not initialized');
     }
 
-    if (this.player.collision(0) || this.player.collision(this.getDimensions().x)) {
-      this.player.bounce();
-    }
-
-    if (this.state === GameState.INITIAL) {
-      this.bullet.position.x = this.player.position;
-    }
-
+    // compute brick-bullet collisions
     for (let i = 0; i < this.bricks.length; i++) {
       for (let j = 0; j < this.bricks[i].length; j++) {
         const brick = this.bricks[i][j];
-        if (this.bullet.intersects(brick)) {
-          const intersectionAngle = this.bullet.intersectionAngle(brick);
-          const diff = this.bullet.velocity.angle - intersectionAngle;
-          this.bullet.velocity.angle = (intersectionAngle - diff);
+        if (brick.isActive() && this.bullet.intersects(brick)) {
+          const normal = brick.getNormal(this.bullet);
+          normal.normalize();
+          const u = normal.multiplyImmutable(this.bullet.velocity.dotProduct(normal));
+          const w = this.bullet.velocity.subtractImmutable(u);
+          this.bullet.velocity = w.subtractImmutable(u);
+          brick.hit();
         }
       }
     }
 
+    // compute player border collisions
+    if (this.player.collision(0) || this.player.collision(this.getDimensions().x)) {
+      this.player.bounce();
+    }
+
+    // compute top border bounce
+    if (this.bullet.position.y >= this.getDimensions().y) {
+      this.bullet.reflectVertical();
+    }
+
+    // compute bullet horizontal border collisions
     if (
       this.bullet.position.x <= this.bullet.radius ||
       this.bullet.position.x + this.bullet.radius >= this.getDimensions().x
@@ -146,16 +154,22 @@ export default class Main {
       this.bullet.reflectHorizontal();
     }
 
-    if (this.bullet.position.y - this.bullet.radius <= 0) {
-      this.resetGame()
-    }
-
-    console.log(this.bullet.position)
-
+    // compute if player bounced the bullet
     if (this.player.intersects(this.bullet)) {
       this.bullet.reflectVertical();
     }
 
+    // set horizontal bullet collision equal to player's if game hasn't started
+    if (this.state === GameState.INITIAL) {
+      this.bullet.position.x = this.player.position;
+    }
+
+    // check if bullet hit the ground
+    if (this.bullet.position.y - this.bullet.radius <= 0) {
+      this.resetGame()
+    }
+
+    // update and redraw objects
     this.player.update();
     this.bullet.update();
 

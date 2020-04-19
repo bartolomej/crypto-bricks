@@ -12,8 +12,8 @@ export default class Circle {
 
   distance (c: Circle) {
     return Math.sqrt(
-      (c.position.x - this.position.x)**2 +
-      (c.position.y - this.position.y)**2
+      (c.position.x - this.position.x) ** 2 +
+      (c.position.y - this.position.y) ** 2
     )
   }
 
@@ -21,9 +21,18 @@ export default class Circle {
     return this.distance(c) < (c.radius + this.radius);
   }
 
+  getNormal (target: Circle) {
+    return this.position.subtractImmutable(target.position);
+  }
+
+  getTangent (target: Circle) {
+    const normal = this.getNormal(target);
+    return new Vector(-normal.y, normal.x);
+  }
+
   intersectionAngle (target: Circle) {
     let dv = target.position.subtractImmutable(this.position);
-    return dv.angle + (Math.PI/2);
+    return dv.angle + (Math.PI / 2);
   }
 
 }

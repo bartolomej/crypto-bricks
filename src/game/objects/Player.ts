@@ -10,7 +10,7 @@ export default class Player {
   private parent: HTMLElement|null;
 
   constructor (width: number, position: number) {
-    this.height = 20;
+    this.height = 15;
     this.width = width;
     this.position = position;
     this.velocity = 0;
@@ -19,17 +19,15 @@ export default class Player {
   }
 
   get acceleration () {
-    return 1;
+    return 4;
   }
 
   moveLeft () {
-    //this.speed = this.speed - this.acceleration;
-    this.velocity = -8;
+    this.velocity -= this.acceleration;
   }
 
   moveRight () {
-    //this.speed = this.speed + this.acceleration;
-    this.velocity = 8;
+    this.velocity += this.acceleration;
   }
 
   bounce () {
@@ -42,15 +40,12 @@ export default class Player {
 
   // only checks vertical collision
   // implemented for our special case
-  intersects (c: Circle) {
-    const d = Math.sqrt(
-      (this.position - c.position.x) ** 2 +
-      (this.height / 2 - c.position.y) ** 2
-    );
+  intersects (bullet: Circle) {
+    const d = bullet.position.y - (this.height / 2);
     if (
-      (c.position.x) >= this.position - this.width / 2 &&
-      (c.position.x) <= this.position + this.width / 2 &&
-      d < c.radius + (this.height / 2)
+      (bullet.position.x) >= this.position - this.width / 2 &&
+      (bullet.position.x) <= this.position + this.width / 2 &&
+      d < bullet.radius + (this.height / 2)
     ) {
       return true;
     }

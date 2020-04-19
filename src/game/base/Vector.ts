@@ -35,6 +35,10 @@ export default class Vector {
     this.y /= this.length();
   }
 
+  dotProduct (v: Vector) {
+    return this.x * v.x + this.y * v.y;
+  }
+
   multiplyImmutable (n: number) {
     return new Vector(
       this.x * n,
@@ -53,7 +57,7 @@ export default class Vector {
   }
 
   subtractImmutable (v: Vector) {
-    return new Vector(v.x - this.x, v.y - this.y);
+    return new Vector(this.x - v.x, this.y - v.y);
   }
 
   add (v: Vector) {
