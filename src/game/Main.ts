@@ -9,23 +9,32 @@ enum GameState {
   STARTED
 }
 
+type Props = {
+  container: HTMLElement;
+  rows: number;
+  columns: number;
+  onScore: Function;
+  onMissed: Function;
+}
+
 export default class Main {
 
   private animation: number | null;
-  private player: Player | null;
-  private bullet: Bullet | null;
-  private bricks: Array<Array<Brick>> | null;
+  private player!: Player;
+  private bullet!: Bullet;
+  private bricks!: Array<Array<Brick>>;
   private readonly rows: number;
   private readonly columns: number;
   private readonly container: HTMLElement;
   private state: GameState;
+  private readonly onScore: Function;
+  private readonly onMissed: Function;
 
-  constructor (container: HTMLElement, rows: number, columns: number) {
+  constructor ({container, rows, columns, onMissed, onScore}: Props) {
+    this.onScore = onScore;
+    this.onMissed = onMissed;
     this.container = container;
     this.animation = null;
-    this.player = null;
-    this.bullet = null;
-    this.bricks = null;
     this.rows = rows;
     this.columns = columns;
     this.state = GameState.INITIAL;
@@ -43,6 +52,16 @@ export default class Main {
     this.initializePlayer();
     this.requestAnimation();
     this.registerListeners();
+  }
+
+  registerListeners () {
+    window.addEventListener('keydown', this.onKeyDown.bind(this));
+  }
+
+  onKeyDown (e: KeyboardEvent) {
+    if (e.code === 'Space' && this.state === GameState.INITIAL) {
+      this.startGame();
+    }
   }
 
   initializeBricks () {
@@ -71,25 +90,23 @@ export default class Main {
     if (this.bullet) {
       this.bullet.removeDom();
     }
-    this.player = new Player(200, this.getDimensions().x / 2);
+    this.player = new Player({
+      width: 200,
+      position: this.getDimensions().x / 2,
+      speed: 20
+    });
     this.bullet = new Bullet(bulletRadius, new Vector(this.player.position, this.player.height + bulletRadius));
     this.player.render(this.container);
     this.bullet.render(this.container);
   }
 
   startGame () {
-    if (!(this.bricks && this.player && this.bullet)) {
-      throw new Error('Not initialized');
-    }
     this.bullet.velocity.y = 8;
     this.bullet.velocity.angle = (Math.random() * Math.PI / 2) + 1;
     this.state = GameState.STARTED;
   }
 
   resetGame () {
-    if (!(this.bricks && this.player && this.bullet)) {
-      throw new Error('Not initialized');
-    }
     this.initializePlayer();
     this.state = GameState.INITIAL;
   }
@@ -100,27 +117,7 @@ export default class Main {
     }
   }
 
-  registerListeners () {
-    window.addEventListener('keydown', this.onKeyDown.bind(this));
-  }
-
-  onKeyDown (e: KeyboardEvent) {
-    if (e.code === 'ArrowLeft') {
-      this.player?.moveLeft();
-    }
-    if (e.code === 'ArrowRight') {
-      this.player?.moveRight();
-    }
-    if (e.code === 'Space' && this.state === GameState.INITIAL) {
-      this.startGame();
-    }
-  }
-
-  gameLoop () {
-    if (!(this.bricks && this.player && this.bullet)) {
-      throw new Error('Not initialized');
-    }
-
+  gameLoop (time: number) {
     // compute brick-bullet collisions
     for (let i = 0; i < this.bricks.length; i++) {
       for (let j = 0; j < this.bricks[i].length; j++) {
@@ -132,13 +129,24 @@ export default class Main {
           const w = this.bullet.velocity.subtractImmutable(u);
           this.bullet.velocity = w.subtractImmutable(u);
           brick.hit();
+          this.onScore();
         }
       }
     }
 
     // compute player border collisions
-    if (this.player.collision(0) || this.player.collision(this.getDimensions().x)) {
-      this.player.bounce();
+    if (this.player.collision(0)) {
+      this.player.bounceRight();
+      this.player.updateRightPosition();
+    }
+    else if (this.player.collision(this.getDimensions().x)) {
+      this.player.bounceLeft();
+      this.player.updateLeftPosition()
+    }
+    else {
+      this.player.updateVelocity();
+      this.player.updateLeftPosition()
+      this.player.updateRightPosition();
     }
 
     // compute top border bounce
@@ -166,12 +174,13 @@ export default class Main {
 
     // check if bullet hit the ground
     if (this.bullet.position.y - this.bullet.radius <= 0) {
-      this.resetGame()
+      this.resetGame();
+      this.onMissed();
     }
 
     // update and redraw objects
-    this.player.update();
-    this.bullet.update();
+    this.player.update(time);
+    this.bullet.update(time);
 
     requestAnimationFrame(this.gameLoop.bind(this));
   }

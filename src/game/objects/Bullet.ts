@@ -39,7 +39,7 @@ export default class Brick extends Circle {
     }
   }
 
-  update () {
+  update (time: number) {
     if (!this.domElement) return;
 
     this.position.add(this.velocity);

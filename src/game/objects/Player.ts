@@ -1,5 +1,13 @@
 import Circle from "../base/Circle";
 
+
+type Props = {
+  width: number;
+  position: number;
+  acceleration?: number|null;
+  speed?: number|null;
+}
+
 export default class Player {
 
   private domElement: HTMLDivElement | null;
@@ -8,30 +16,54 @@ export default class Player {
   position: number;
   height: number;
   private parent: HTMLElement|null;
+  private rightKeyDown: boolean;
+  private leftKeyDown: boolean;
+  private acceleration: number | null | undefined;
+  private constantVelocity: number|null;
 
-  constructor (width: number, position: number) {
+  constructor ({width, position, acceleration = null, speed = null} : Props) {
     this.height = 15;
     this.width = width;
     this.position = position;
     this.velocity = 0;
+    this.constantVelocity = speed;
+    this.acceleration = acceleration;
     this.domElement = null;
     this.parent = null;
+    this.rightKeyDown = false;
+    this.leftKeyDown = false;
+    this.registerListeners();
   }
 
-  get acceleration () {
-    return 4;
+  registerListeners () {
+    window.addEventListener('keydown', this.onKeyDown.bind(this))
+    window.addEventListener('keyup', this.onKeyUp.bind(this))
   }
 
-  moveLeft () {
-    this.velocity -= this.acceleration;
+  onKeyDown (e: KeyboardEvent) {
+    if (e.code === 'ArrowLeft') {
+      this.leftKeyDown = true;
+    }
+    if (e.code === 'ArrowRight') {
+      this.rightKeyDown = true;
+    }
   }
 
-  moveRight () {
-    this.velocity += this.acceleration;
+  onKeyUp (e: KeyboardEvent) {
+    if (e.code === 'ArrowLeft') {
+      this.leftKeyDown = false;
+    }
+    if (e.code === 'ArrowRight') {
+      this.rightKeyDown = false;
+    }
   }
 
-  bounce () {
-    this.velocity *= -1;
+  bounceLeft () {
+    this.velocity = -Math.abs(this.velocity) * 0.8;
+  }
+
+  bounceRight () {
+    this.velocity = Math.abs(this.velocity) * 0.8;
   }
 
   collision (x: number) {
@@ -69,11 +101,41 @@ export default class Player {
     }
   }
 
-  update () {
-    if (!this.domElement) return;
-    this.position += this.velocity;
-    this.domElement.style.left = `${this.position - this.width / 2}px`;
+  updateVelocity () {
+    // check if initialized as constant velocity movement
+    if (!this.acceleration) return;
 
+    if (this.leftKeyDown) {
+      this.velocity -= this.acceleration;
+    }
+    if (this.rightKeyDown) {
+      this.velocity += this.acceleration;
+    }
+  }
+
+  updateRightPosition () {
+    if (this.constantVelocity) {
+      if (this.rightKeyDown) {
+        this.position += this.constantVelocity;
+      }
+    }
+  }
+
+  updateLeftPosition () {
+    if (this.constantVelocity) {
+      if (this.leftKeyDown) {
+        this.position -= this.constantVelocity;
+      }
+    }
+  }
+
+  update (time: number) {
+    if (!this.domElement) return;
+
+    if (this.acceleration) {
+      this.position += this.velocity;
+    }
+    this.domElement.style.left = `${this.position - this.width / 2}px`;
   }
 
 }

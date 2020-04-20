@@ -1,8 +1,18 @@
+:root {
+    --dark: rgba(13, 18, 33, 1);
+    --primary: rgba(81, 222, 210, 1);
+    --vibrant: rgba(217, 3, 104, 1);
+    --darkish: rgba(38, 64, 139, 1);
+    --light: rgba(255, 255, 255, 1);
+}
+
 #game-container {
     height: 100%;
     width: 100%;
+    overflow: hidden;
     position: relative;
-    border: 2px solid black;
+    border-radius: 10px;
+    background: rgba(27, 35, 56, 0.5);
 }
 
 .brick {
@@ -15,10 +25,11 @@
 }
 
 .player {
-    background: brown;
+    background: var(--primary);
+    border-radius: 10px;
 }
 
 .bullet {
     border-radius: 50%;
-    background: black;
+    background: var(--vibrant);
 }
