@@ -30,9 +30,4 @@ export default class Circle {
     return new Vector(-normal.y, normal.x);
   }
 
-  intersectionAngle (target: Circle) {
-    let dv = target.position.subtractImmutable(this.position);
-    return dv.angle + (Math.PI / 2);
-  }
-
 }

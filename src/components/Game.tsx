@@ -1,13 +1,36 @@
 import Game from "../game";
 import Stats from "./Stats";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 // @ts-ignore
 import UseAnimations from "react-useanimations";
 import { Link } from "react-router-dom";
 
 
+const gameHeight = window.innerHeight - (window.innerHeight / 5);
+const gameWidth = window.innerWidth - (window.innerWidth / 3);
+
 export default function () {
+  const [transactions, setTx]: any = useState([]);
+  const [time, setTime]: any = useState(0);
+  const [int, setInt]: any = useState(null);
+
+  useEffect(() => () => int && clearInterval(int), []);
+
+  function onMissed () {
+    setTx((prev: any) => [...prev, { coin: prev[prev.length - 1].coin, incoming: false }]);
+  }
+
+  function onScore (coin: string) {
+    setTx((prev: any) => [...prev, { coin, incoming: true }]);
+  }
+
+  function onStart () {
+    setInt(setInterval(() => {
+      setTime((prev: number) => prev + 1);
+    }, 1000));
+  }
+
 
   return (
     <>
@@ -18,13 +41,16 @@ export default function () {
         <Game
           rows={2}
           columns={20}
-          onMissed={console.log}
-          onScore={console.log}
-          width={window.innerWidth - (window.innerWidth / 3)}
-          height={window.innerHeight - (window.innerHeight / 5)}
+          onMissed={onMissed}
+          onScore={onScore}
+          onStart={onStart}
+          width={gameWidth}
+          height={gameHeight}
         />
         <Stats
-          transactions={[]}
+          time={time}
+          height={gameHeight}
+          transactions={transactions}
         />
       </GameWrapper>
     </>

@@ -14,12 +14,32 @@ export default class Brick extends Circle {
     this.parent = null;
   }
 
+  setPositionAnimated(pos: Vector) {
+    if (!this.domElement) return;
+    const duration = 1;
+    this.domElement.style.transition = `all ${duration}s ease-in-out`;
+    this.position = pos;
+    setTimeout(() => {
+      if (!this.domElement) return;
+      this.domElement.style.transition = '';
+    }, duration * 1000)
+  }
+
   reflectHorizontal () {
     this.velocity.x *= -1;
   }
 
   reflectVertical () {
     this.velocity.y *= -1;
+  }
+
+  // compute velocity after bounce
+  bounceVelocity (target: Circle) {
+    const normal = target.getNormal(this);
+    normal.normalize();
+    const u = normal.multiplyImmutable(this.velocity.dotProduct(normal) / normal.dotProduct(normal));
+    const w = this.velocity.subtractImmutable(u);
+    return w.subtractImmutable(u);
   }
 
   render (parent: HTMLElement) {

@@ -6,7 +6,7 @@ import Vector from "./base/Vector";
 
 enum GameState {
   INITIAL,
-  STARTED
+  STARTED,
 }
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
   columns: number;
   onScore: Function;
   onMissed: Function;
+  onStart: Function;
   playerSize?: number;
   bulletSize?: number;
 }
@@ -35,10 +36,12 @@ export default class Main {
   private brickPadding: number;
   private readonly bulletSize: number;
   private readonly playerSize: number;
+  private readonly onStart: Function;
 
-  constructor ({ container, rows, columns, onMissed, onScore, bulletSize, playerSize }: Props) {
+  constructor ({ container, rows, columns, onMissed, onScore, bulletSize, playerSize, onStart }: Props) {
     this.onScore = onScore;
     this.onMissed = onMissed;
+    this.onStart = onStart;
     this.domElement = container;
     this.animation = null;
     this.rows = rows;
@@ -57,9 +60,22 @@ export default class Main {
     }
   }
 
+  private get initialPlayerPosition () {
+    return this.getDimensions().x / 2;
+  }
+
+  private get initialBulletPosition () {
+    return new Vector(this.player.position, this.player.getHeight() + this.bulletSize / 2);
+  }
+
+  private get brickWidth () {
+    const { borderPadding, brickPadding } = this;
+    return (this.getDimensions().x - (borderPadding * 2) - ((this.columns - 1) * brickPadding)) / this.columns;
+  }
+
   initialize () {
     this.initializeBricks();
-    this.initializePlayer();
+    this.initializePlayerAndBall();
     this.requestAnimation();
     this.registerListeners();
   }
@@ -81,15 +97,15 @@ export default class Main {
   initializeBricks () {
     const bricks = [];
     const { borderPadding, brickPadding } = this;
-    const brickWidth = (this.getDimensions().x - (borderPadding * 2) - ((this.columns - 1) * brickPadding)) / this.columns;
+    const bW = this.brickWidth;
     for (let i = 0; i < this.rows; i++) {
       const row = [];
       for (let j = 0; j < this.columns; j++) {
         const xPadding = (j === 0 ? 0 : j * brickPadding);
         const yPadding = (i === 0 ? 0 : i * brickPadding);
-        const x = ((brickWidth * j) + brickWidth / 2 + borderPadding + xPadding);
-        const y = this.getDimensions().y - ((brickWidth * i) + brickWidth / 2) - borderPadding - yPadding;
-        row.push(new Brick(brickWidth / 2, new Vector(x, y)));
+        const x = ((bW * j) + bW / 2 + borderPadding + xPadding);
+        const y = this.getDimensions().y - ((bW * i) + bW / 2) - borderPadding - yPadding;
+        row.push(new Brick(bW / 2, new Vector(x, y)));
       }
       bricks.push(row);
     }
@@ -97,7 +113,7 @@ export default class Main {
     this.domElement.append(...this.bricks.flat(2).map(e => e.render()))
   }
 
-  initializePlayer () {
+  initializePlayerAndBall () {
     if (this.player) {
       this.player.removeDom();
     }
@@ -106,26 +122,34 @@ export default class Main {
     }
     this.player = new Player({
       width: this.playerSize,
-      position: this.getDimensions().x / 2,
+      position: this.initialPlayerPosition,
       speed: 20
     });
     this.bullet = new Bullet(
       this.bulletSize / 2,
-      new Vector(this.player.position, this.player.getHeight() + this.bulletSize / 2)
+      this.initialBulletPosition
     );
     this.player.render(this.domElement);
     this.bullet.render(this.domElement);
+  }
+
+  resetPlayerAndBall () {
+    this.player.setPositionAnimated(this.initialPlayerPosition);
+    this.bullet.setPositionAnimated(this.initialBulletPosition);
   }
 
   startGame () {
     this.bullet.velocity.y = 8;
     this.bullet.velocity.angle = (Math.random() * Math.PI / 2) + 1;
     this.state = GameState.STARTED;
+    this.onStart();
   }
 
-  resetGame () {
-    this.initializePlayer();
+  resetRound () {
+    this.onMissed();
+    this.resetPlayerAndBall();
     this.state = GameState.INITIAL;
+    this.bullet.velocity.y = 0;
   }
 
   requestAnimation () {
@@ -140,11 +164,7 @@ export default class Main {
       for (let j = 0; j < this.bricks[i].length; j++) {
         const brick = this.bricks[i][j];
         if (brick.isActive() && this.bullet.intersects(brick)) {
-          const normal = brick.getNormal(this.bullet);
-          normal.normalize();
-          const u = normal.multiplyImmutable(this.bullet.velocity.dotProduct(normal) / normal.dotProduct(normal));
-          const w = this.bullet.velocity.subtractImmutable(u);
-          this.bullet.velocity = w.subtractImmutable(u);
+          this.bullet.velocity = this.bullet.bounceVelocity(brick);
           brick.hit();
           this.onScore(brick.coin);
         }
@@ -180,6 +200,8 @@ export default class Main {
     // compute if player bounced the bullet
     if (this.player.intersects(this.bullet)) {
       this.bullet.reflectVertical();
+    } else if (this.player.intersectsCorners(this.bullet)) {
+      this.bullet.velocity = this.player.cornerIntersection(this.bullet);
     }
 
     // set horizontal bullet collision equal to player's if game hasn't started
@@ -189,8 +211,7 @@ export default class Main {
 
     // check if bullet hit the ground
     if (this.bullet.position.y - this.bullet.radius <= 0) {
-      this.resetGame();
-      this.onMissed();
+      this.resetRound();
     }
 
     // update and redraw objects

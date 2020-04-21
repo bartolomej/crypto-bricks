@@ -1,28 +1,30 @@
 import Circle from "../base/Circle";
+import Vector from "../base/Vector";
+import Bullet from "./Bullet";
 
 
 type Props = {
   width: number;
   position: number;
-  acceleration?: number|null;
-  speed?: number|null;
+  acceleration?: number | null;
+  speed?: number | null;
 }
 
 export default class Player {
 
   private domElement: HTMLDivElement | null;
-  private width: number;
+  private readonly width: number;
+  private readonly height: number;
   velocity: number;
   position: number;
-  private height: number;
-  private parent: HTMLElement|null;
+  private parent: HTMLElement | null;
   private rightKeyDown: boolean;
   private leftKeyDown: boolean;
-  private acceleration: number | null | undefined;
-  private constantVelocity: number|null;
-  private bottomPadding: number;
+  private readonly acceleration: number | null | undefined;
+  private readonly constantVelocity: number | null;
+  private readonly bottomPadding: number;
 
-  constructor ({width, position, acceleration = null, speed = null} : Props) {
+  constructor ({ width, position, acceleration = null, speed = null }: Props) {
     this.height = 15;
     this.bottomPadding = 8;
     this.width = width;
@@ -35,6 +37,24 @@ export default class Player {
     this.rightKeyDown = false;
     this.leftKeyDown = false;
     this.registerListeners();
+  }
+
+  private getCorners () {
+    const r = this.height / 2;
+    const left = new Circle(r, new Vector(this.position - (this.width / 2) + r, r));
+    const right = new Circle(r, new Vector(this.position + (this.width / 2) - r, r));
+    return { left, right };
+  }
+
+  setPositionAnimated(pos: number) {
+    if (!this.domElement) return;
+    const duration = 1;
+    this.domElement.style.transition = `all ${duration}s ease-in-out`;
+    this.position = pos;
+    setTimeout(() => {
+      if (!this.domElement) return;
+      this.domElement.style.transition = '';
+    }, duration * 1000)
   }
 
   getHeight () {
@@ -86,6 +106,20 @@ export default class Player {
       d < bullet.radius + ((this.height + this.bottomPadding) / 2)
     ) {
       return true;
+    }
+  }
+
+  intersectsCorners (bullet: Circle) {
+    const { left, right } = this.getCorners();
+    return right.intersects(bullet) || left.intersects(bullet);
+  }
+
+  cornerIntersection (source: Bullet) {
+    const { left, right } = this.getCorners();
+    if (left.distance(source) < right.distance(source)) {
+      return source.bounceVelocity(left);
+    } else {
+      return source.bounceVelocity(right);
     }
   }
 

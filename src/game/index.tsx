@@ -9,6 +9,7 @@ type Props = {
   rows: number;
   columns: number;
   onMissed: Function;
+  onStart: Function;
   onScore: (coin: string) => void;
 }
 
@@ -36,14 +37,13 @@ export default class Game extends React.Component<Props, any> {
       rows: this.props.rows,
       columns: this.props.columns,
       onMissed: this.props.onMissed,
-      onScore: this.props.onScore
+      onScore: this.props.onScore,
+      onStart: this.props.onStart
     });
     this.game.initialize();
-    console.log('didMount', this.el);
   }
 
   componentWillUnmount (): void {
-    console.log('unmounting')
     this.game?.destroy();
   }
 
