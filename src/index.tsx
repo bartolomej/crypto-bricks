@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import Main from "./Main";
+import Router from "./Router";
 import { ThemeProvider } from "styled-components";
+import { BrowserRouter } from "react-router-dom";
 
 
 // https://coolors.co/0d1221-51ded2-d90368-26408b-ffffff
@@ -15,10 +16,17 @@ export const theme = {
   light: 'rgba(255, 255, 255, 1)'
 }
 
+export function colorWithOpacity (color: string, opacity: number) {
+  let [r, g, b] = color.substring(color.indexOf('(') + 1, color.indexOf(')')).split(',').map(e => e.trim());
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <Main/>
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

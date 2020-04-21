@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './style.css';
 import Main from "./Main";
 
@@ -9,23 +9,46 @@ type Props = {
   rows: number;
   columns: number;
   onMissed: Function;
-  onScore: Function;
+  onScore: (coin: string) => void;
 }
 
-export default function ({ height, width, rows, columns, onMissed, onScore} : Props) {
-  const ref: any = React.useRef(null);
+export default class Game extends React.Component<Props, any> {
 
-  useEffect(() => {
-    ref.current.style.width = `${width}px`
-    ref.current.style.height = `${height}px`
-    const main = new Main({
-      container: ref.current,
-      rows, columns,
-      onMissed, onScore
+  private el: HTMLElement | null;
+  private game: Main | null;
+
+  constructor (props: any) {
+    super(props);
+    this.el = null;
+    this.game = null;
+  }
+
+  shouldComponentUpdate () {
+    return false;
+  }
+
+  componentDidMount () {
+    if (!this.el) return;
+    this.el.style.width = `${this.props.width}px`
+    this.el.style.height = `${this.props.height}px`
+    this.game = new Main({
+      container: this.el,
+      rows: this.props.rows,
+      columns: this.props.columns,
+      onMissed: this.props.onMissed,
+      onScore: this.props.onScore
     });
-    main.initialize();
-  }, [ref]);
+    this.game.initialize();
+    console.log('didMount', this.el);
+  }
 
+  componentWillUnmount (): void {
+    console.log('unmounting')
+    this.game?.destroy();
+  }
 
-  return <div id="game-container" ref={ref}/>;
+  render () {
+    return <div id="game-container" ref={el => this.el = el}/>;
+  }
+
 }

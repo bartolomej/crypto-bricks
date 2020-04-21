@@ -14,15 +14,17 @@ export default class Player {
   private width: number;
   velocity: number;
   position: number;
-  height: number;
+  private height: number;
   private parent: HTMLElement|null;
   private rightKeyDown: boolean;
   private leftKeyDown: boolean;
   private acceleration: number | null | undefined;
   private constantVelocity: number|null;
+  private bottomPadding: number;
 
   constructor ({width, position, acceleration = null, speed = null} : Props) {
     this.height = 15;
+    this.bottomPadding = 8;
     this.width = width;
     this.position = position;
     this.velocity = 0;
@@ -33,6 +35,10 @@ export default class Player {
     this.rightKeyDown = false;
     this.leftKeyDown = false;
     this.registerListeners();
+  }
+
+  getHeight () {
+    return this.height + this.bottomPadding + 5;
   }
 
   registerListeners () {
@@ -77,7 +83,7 @@ export default class Player {
     if (
       (bullet.position.x) >= this.position - this.width / 2 &&
       (bullet.position.x) <= this.position + this.width / 2 &&
-      d < bullet.radius + (this.height / 2)
+      d < bullet.radius + ((this.height + this.bottomPadding) / 2)
     ) {
       return true;
     }
@@ -87,7 +93,7 @@ export default class Player {
     const container = document.createElement('div');
     container.className = 'player';
     container.style.position = 'absolute';
-    container.style.bottom = '0px';
+    container.style.bottom = this.bottomPadding + 'px';
     container.style.height = `${this.height}px`;
     container.style.width = `${this.width}px`;
     this.domElement = container;
