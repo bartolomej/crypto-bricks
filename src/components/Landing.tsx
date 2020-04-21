@@ -34,10 +34,16 @@ export default function () {
         />
       </div>
       <Title>Crypto Bricks</Title>
-      <LinkButton to="/game">
-        <span>Start</span>
-        <UseAnimations animationKey="arrowDown" size={30}/>
-      </LinkButton>
+      <ActionsWrapper>
+        <LinkButton to="/play">
+          <span>Start</span>
+          <UseAnimations animationKey="arrowDown" size={30}/>
+        </LinkButton>
+        <LinkButton to="/challenge">
+          <span>Challenges</span>
+          <UseAnimations animationKey="arrowDown" size={30}/>
+        </LinkButton>
+      </ActionsWrapper>
     </>
   )
 }
@@ -68,6 +74,11 @@ const Icon = styled.img<any>`
 const Title = styled.h1`
   font-size: 4em;
   color: ${props => props.theme.vibrant};
+`;
+
+const ActionsWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 
 const LinkButton = styled(Link)`

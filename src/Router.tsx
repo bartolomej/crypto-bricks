@@ -4,6 +4,7 @@ import { animated, useTransition } from 'react-spring'
 import styled from "styled-components";
 import Landing from "./components/Landing";
 import Game from "./components/Game";
+import Challenges from "./components/Challenges";
 
 export default function Router () {
   const location = useLocation();
@@ -19,7 +20,8 @@ export default function Router () {
         <Page key={key} style={props}>
           <Switch location={location}>
             <Route path="/" exact component={Landing}/>
-            <Route path="/game" component={Game}/>
+            <Route path="/challenge" component={Challenges}/>
+            <Route path="/play" component={Game}/>
           </Switch>
         </Page>
       ))}
