@@ -2,6 +2,10 @@
 
 Fun little game in development for a school project.
 
+## Getting started
+- [Ethereum resources](https://ethereum.org/developers/#getting-started)
+- [Debugging smart contracts](https://www.trufflesuite.com/tutorials/debugging-a-smart-contract)
+
 ## Scripts
 
 - `yarn install` - install dependencies
@@ -11,4 +15,3 @@ Fun little game in development for a school project.
 ## Attributions
 - [Cryptocurrency icons](https://github.com/reddavis/Crypto-Icons-API)
 - [Animated icons](https://react.useanimations.com/)
-- [Animation library](https://github.com/react-spring/react-spring)
