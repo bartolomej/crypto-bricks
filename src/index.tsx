@@ -9,7 +9,7 @@ import { BrowserRouter } from "react-router-dom";
 
 // https://coolors.co/0d1221-51ded2-d90368-26408b-ffffff
 export const theme = {
-  dark: 'rgba(13, 18, 33, 1)',
+  dark: 'rgb(13,18,33)',
   vibrant: 'rgba(217, 3, 104, 1)',
   primary: 'rgba(81, 222, 210, 1)',
   darkish: 'rgba(38, 64, 139, 1)',
