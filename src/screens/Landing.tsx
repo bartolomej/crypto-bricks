@@ -32,8 +32,8 @@ export default function () {
         <LinkButton to="/play">
           <span>Just Play</span>
         </LinkButton>
-        <LinkButton to="/battles">
-          <span>Take Challenge</span>
+        <LinkButton to="/bounties">
+          <span>Compete and earn</span>
         </LinkButton>
       </ActionsWrapper>
     </>

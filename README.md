@@ -22,3 +22,4 @@ A little game that interacts with Ethereum network. Developed for a school proje
 ## Attributions
 - [Cryptocurrency icons](https://github.com/reddavis/Crypto-Icons-API)
 - [Animated icons](https://react.useanimations.com/)
+- Icons made by <a href="https://www.flaticon.com/authors/prettycons" title="prettycons">prettycons</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>

@@ -50,13 +50,13 @@ export default function () {
   return (
     <>
       <NavigationRow>
-        <NavLink to="/battles">
+        <NavLink to="/bounties">
           Open
         </NavLink>
-        <NavLink to="/battles">
+        <NavLink to="/bounties">
           Closed
         </NavLink>
-        <NavLink to="/battles">
+        <NavLink to="/bounties">
           Create
         </NavLink>
       </NavigationRow>
@@ -72,7 +72,7 @@ export default function () {
               <span>Player: {c.player}</span>
               <span>Reward: {c.reward}</span>
               <span>Time: {c.time}</span>
-              <PlayButton to="play">
+              <PlayButton to="/play">
                 Play
                 <UseAnimations animationKey="arrowDown" size={15}/>
               </PlayButton>

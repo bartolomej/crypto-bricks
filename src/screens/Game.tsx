@@ -16,6 +16,7 @@ const gameWidth = window.innerWidth - (window.innerWidth / 3);
 
 export default function () {
   const gameRef: any = React.useRef();
+  const txWrapper: any = React.useRef();
   const [transactions, setTx]: [Array<Transaction>, any] = useState([]);
   const [time, setTime]: any = useState(0);
   const [int, setInt]: any = useState(null);
@@ -27,7 +28,12 @@ export default function () {
   const [playerSize, setPlayerSize]: any = useState(150);
   const [bulletSize, setBulletSize]: any = useState(40);
 
-  useEffect(() => () => int && clearInterval(int), []);
+  useEffect(() => () => {
+    int && clearInterval(int)
+  }, []);
+  useEffect(() => {
+    txWrapper.current.scrollTop = 0
+  }, [transactions]);
 
   function onMissed () {
     setTx((prev: any) => [...prev, { coin: prev[prev.length - 1].coin, incoming: false }]);
@@ -48,7 +54,13 @@ export default function () {
   }
 
   function onSettings () {
+    gameRef.current.stopAnimation();
     setShowModal(true);
+  }
+
+  function onCloseSettings () {
+    gameRef.current.startAnimation();
+    setShowModal(false)
   }
 
   function onReset () {
@@ -66,8 +78,8 @@ export default function () {
 
   return (
     <>
-      <Modal show={showModal} onClose={() => setShowModal(false)}>
-        <Title>Game parameters</Title>
+      <Modal show={showModal} onClose={onCloseSettings}>
+        <Title>Game settings</Title>
         <ParamsView
           columns={columns}
           totalBricks={rows * columns}
@@ -101,7 +113,7 @@ export default function () {
               <StatsText>Elapsed time: <span>{time}s</span></StatsText>
               <StatsText>Total score: <span>{score}</span></StatsText>
             </TextWrapper>
-            <TxWrapper>
+            <TxWrapper ref={txWrapper}>
               {transactions.map((tx: any, i) => (
                 <Transaction key={i} incoming={tx.incoming}>
                   <CoinImg src={require(`../game/assets/${tx.coin.symbol.toLowerCase()}.png`)}/>
@@ -172,6 +184,9 @@ const TxWrapper = styled.div`
   overflow-y: scroll;
   width: 100%;
   flex: 7;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
 `;
 
 const Title = styled.h3`
@@ -199,12 +214,9 @@ const Button = styled.button`
   color: ${props => props.theme.primary};
   transition: 0.3s all ease-in-out;
   padding: 5px 10px;
-  border-radius: 5px;
-  border: 2px solid ${props => props.theme.primary};
   font-size: 1em;
   &:hover {
     color: ${props => props.theme.light};
-    background: ${props => props.theme.primary};
   }
 `;
 

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
 import { animated, useTransition } from "react-spring";
-import { ReactComponent as blockchain } from '../assets/blockchain.svg';
+import { ReactComponent as ethereum } from '../assets/ethereum.svg';
+import { ReactComponent as smartContract } from '../assets/smart-contract.svg';
+// @ts-ignore
+import UseAnimations from "react-useanimations";
+import { Link } from "react-router-dom";
 
 
 export default function () {
@@ -15,29 +19,36 @@ export default function () {
     {
       key: 0,
       content: (
-        <>
-          <Image/>
+        <SectionWrapper>
+          <Ethereum/>
           <Description>
-            Ddnad askdjasndkas fkasf ksajd kasd as
+            This website will allow users to post "bounties" with rewards in ETH, that challenge other
+            users to beat them in a chosen game with given settings.
           </Description>
           <NextButton onClick={onNext}>
-            Next
+            <UseAnimations
+              animationKey="arrowDown"
+              size={30}
+            />
           </NextButton>
-        </>
+        </SectionWrapper>
       )
     },
     {
       key: 1,
       content: (
-        <>
-          <Image/>
+        <SectionWrapper>
+          <SmartContract/>
           <Description>
-            Ddnad askdjasndkas fkasf ksajd kasd as
+            All validation and staking logic will execute on Ethereum distributed computer network in a program known as a "smart contract".
           </Description>
-          <NextButton onClick={onNext}>
-            next
-          </NextButton>
-        </>
+          <DoneButton to="/bounties">
+            <UseAnimations
+              animationKey="arrowDown"
+              size={30}
+            />
+          </DoneButton>
+        </SectionWrapper>
       )
     },
   ]
@@ -51,9 +62,9 @@ export default function () {
   return (
     <Container>
       {transitions.map(({ item, props, key }) => (
-        <Section key={key} style={props}>
+        <Subpage key={key} style={props}>
           {sections[item].content}
-        </Section>
+        </Subpage>
       ))}
     </Container>
   )
@@ -64,7 +75,7 @@ const Container = styled.div`
   height: 100vh;
 `;
 
-const Section = styled(animated.div)`
+const Subpage = styled(animated.div)`
   position: absolute;
   width: 100%;
   height: 100%;
@@ -74,23 +85,48 @@ const Section = styled(animated.div)`
   justify-content: center;
 `;
 
-const Image = styled(blockchain)`
-  width: 200px;
-  height: 200px;
+const SectionWrapper = styled.div`
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Ethereum = styled(ethereum)`
+  width: 150px;
+  height: 150px;
+  margin-bottom: 10px;
+`;
+
+const SmartContract = styled(smartContract)`
+  width: 150px;
+  height: 150px;
+  margin-bottom: 10px;
 `;
 
 const Description = styled.p`
   font-size: 1.2em;
   color: ${props => props.theme.light};
   margin: 20px 0;
+  text-align: center;
 `;
 
 const NextButton = styled.button`
-  font-size: 1.4em;
-  font-weight: bold;
   color: ${props => props.theme.primary};
+  transition: 0.5s all ease-in-out;
+  transform: rotate(-90deg);
   &:hover {
-    color: ${props => props.theme.vibrant};
+    color: ${props => props.theme.light};
+    transform: rotate(-90deg) scale(1.2);
+  }
+`;
+
+const DoneButton = styled(Link)`
+  color: ${props => props.theme.primary};
+  transition: 0.5s all ease-in-out;
+  &:hover {
+    color: ${props => props.theme.light};
     transform: scale(1.2);
   }
 `;

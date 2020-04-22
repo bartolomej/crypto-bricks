@@ -44,6 +44,7 @@ export default class Main {
   private enableInteraction: boolean;
   private scoredBricks: number;
   private readonly onFinish: Function;
+  private running: boolean;
 
   constructor ({
     container,
@@ -75,6 +76,7 @@ export default class Main {
     this.enableInteraction = true;
     this.domElement.appendChild(this.bricksWrapperDom);
     this.scoredBricks = 0;
+    this.running = false;
   }
 
   setEnableInteraction (enable: boolean) {
@@ -131,7 +133,7 @@ export default class Main {
     this.initializeBricks();
     this.initializePlayer();
     this.initializeBullet();
-    this.requestAnimation();
+    this.startAnimation();
     this.registerListeners();
   }
 
@@ -176,6 +178,7 @@ export default class Main {
   }
 
   destroy () {
+    this.stopAnimation();
     this.domElement.remove();
   }
 
@@ -237,13 +240,25 @@ export default class Main {
     }
   }
 
-  requestAnimation () {
-    if (!this.animation) {
-      this.animation = requestAnimationFrame(this.gameLoop.bind(this));
-    }
+  stopAnimation () {
+    // @ts-ignore
+    window.cancelAnimationFrame(this.animation);
+    this.running = false;
+    console.log('stopping animation: ', this.animation);
+  }
+
+  startAnimation () {
+    this.stopAnimation();
+    this.animation = requestAnimationFrame(this.gameLoop.bind(this));
+    this.running = true;
+    console.log('starting animation: ', this.animation);
   }
 
   gameLoop () {
+    console.log('running animation: ', this.animation);
+    if (!this.running) {
+      return this.stopAnimation();
+    }
     // compute brick-bullet collisions and response
     for (let i = 0; i < this.bricks.length; i++) {
       for (let j = 0; j < this.bricks[i].length; j++) {
