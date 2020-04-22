@@ -8,16 +8,34 @@ export default function () {
 
   return (
     <>
-      <Title>Made with ❤️ by Bartolomej</Title>
+      <Title>
+        Made with ❤️ by
+        <Link
+          target="_blank"
+          css="margin-left: 4px; transform: none !important;"
+          href="https://github.com/bartolomej"
+        >
+          Bartolomej
+        </Link>
+      </Title>
       <Wrapper>
         <Description>
           Some of the visual inspiration comes from
-          <Link target="_blank" css="margin-left: 2px;" href="https://tokens.net">Tokens.net</Link>
+          <Link
+            target="_blank"
+            css="margin-left: 2px;"
+            href="https://tokens.net"
+          >
+            Tokens.net
+          </Link>
         </Description>
       </Wrapper>
       <Wrapper>
         <Title>Available on</Title>
-        <Link target="_blank" href="https:/github.com/bartolomej/crypto-bricks">
+        <Link
+          target="_blank"
+          href="https:/github.com/bartolomej/crypto-bricks"
+        >
           <UseAnimations animationKey="github" size={100}/>
         </Link>
       </Wrapper>

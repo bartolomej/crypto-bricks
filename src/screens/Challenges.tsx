@@ -4,12 +4,14 @@ import Contract from "../web3/Contract";
 import { Link } from "react-router-dom";
 // @ts-ignore
 import UseAnimations from "react-useanimations";
-import { Loading } from "../ui";
+import ErrorView from "../components/ErrorView";
+import LoadingView from "../components/LoadingView";
 
 
 export default function () {
   const [challenges, setChallenges]: any = useState([]);
   const [isLoading, setLoading]: any = useState(true);
+  const [error, setError]: any = useState(null);
   const contract: any = React.useRef();
 
   useEffect(() => {
@@ -18,19 +20,22 @@ export default function () {
       try {
         await c.initWeb3();
       } catch (e) {
-        console.log(e);
+        setError(e);
+        console.log('initWeb3 error: ', e);
       }
       try {
         await c.initContract()
       } catch (e) {
-        console.log(e)
+        setError(e);
+        console.log('initContract error: ', e);
       }
       try {
         setChallenges(await c.getChallenges());
       } catch (e) {
-        console.log(e);
+        setError(e);
+        console.log('challenges fetch error: ', e);
       }
-      setTimeout(() => setLoading(false), 3000);
+      setLoading(false);
       contract.current = c;
     })();
   }, []);
@@ -50,7 +55,10 @@ export default function () {
         </NavLink>
       </NavigationRow>
       <Container>
-        {isLoading && <Loading/>}
+        {isLoading && <LoadingView/>}
+        {error && (
+          <ErrorView message={error.message}/>
+        )}
         <ChallengeWrapper>
           {challenges.map((e: any) => new Array(20).fill(e)).flat().map((c: any, i: number) => (
             <Challenge key={i}>
@@ -74,6 +82,9 @@ const Container = styled.div`
   height: 95vh;
   width: 100vw;
   overflow-y: scroll;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const NavigationRow = styled.div`

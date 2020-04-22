@@ -6,8 +6,8 @@ import btc from "../assets/btc-white.png";
 // @ts-ignore
 import mkr from "../assets/mkr-white.png";
 import styled from "styled-components";
-import { colorWithOpacity } from "../index";
 import { Link } from "react-router-dom";
+import { colorWithOpacity } from "../style";
 
 
 export default function () {
@@ -20,9 +20,7 @@ export default function () {
           src={eth}
           delay={"1"}
         />
-        <Icon
-          src={btc}
-        />
+        <Icon src={btc} />
         <Icon
           transform="rotate(20deg)"
           src={mkr}
@@ -79,7 +77,7 @@ const LinkButton = styled(Link)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: ${props => props.theme.primary};
+  color: ${props => props.theme.light};
   transition: 0.3s all ease-in-out;
   margin: 0 40px;
   padding: 5px 20px;
@@ -88,7 +86,7 @@ const LinkButton = styled(Link)`
     font-weight: bold;
   }
   &:hover {
-    color: ${props => props.theme.vibrant};
+    color: ${props => props.theme.primary};
     transform: scale(1.2);
   }
 `;

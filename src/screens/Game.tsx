@@ -1,6 +1,8 @@
 import Game from "../game";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import Modal from "../components/Modal";
+import ParamsView from "../components/ParamsView";
 
 
 type Transaction = {
@@ -15,6 +17,7 @@ export default function () {
   const [transactions, setTx]: [Array<Transaction>, any] = useState([]);
   const [time, setTime]: any = useState(0);
   const [int, setInt]: any = useState(null);
+  const [showModal, setShowModal]: any = useState(false);
 
   useEffect(() => () => int && clearInterval(int), []);
 
@@ -44,6 +47,13 @@ export default function () {
 
   return (
     <>
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+        <Title>Game parameters</Title>
+        <ParamsView/>
+        <Button onClick={console.log}>
+          Submit
+        </Button>
+      </Modal>
       <GameWrapper>
         <Game
           rows={2}
@@ -57,7 +67,7 @@ export default function () {
         <StatsContainer h={gameHeight}>
           <Section>
             <TextWrapper>
-              <StatsTitle>Your stats</StatsTitle>
+              <Title>Your stats</Title>
               <StatsText>Elapsed time: <b>{time}s</b></StatsText>
               <StatsText>Total score: <b>{score}</b></StatsText>
             </TextWrapper>
@@ -71,12 +81,12 @@ export default function () {
               ))}
             </TxWrapper>
             <ControlsWrapper>
-              <StatsButton onClick={onReset}>
+              <Button onClick={onReset}>
                 Post challenge
-              </StatsButton>
-              <StatsButton onClick={onReset}>
+              </Button>
+              <Button onClick={() => setShowModal(true)}>
                 Reset
-              </StatsButton>
+              </Button>
             </ControlsWrapper>
           </Section>
         </StatsContainer>
@@ -133,7 +143,7 @@ const TxWrapper = styled.div`
   flex: 7;
 `;
 
-const StatsTitle = styled.h3`
+const Title = styled.h3`
   font-size: 2em;
   color: ${props => props.theme.primary};
 `;
@@ -143,13 +153,13 @@ const StatsText = styled.span`
   color: ${props => props.theme.light};
 `;
 
-const StatsButton = styled.button`
+const Button = styled.button`
   display: flex;
   flex-direction: column;
   align-items: center;
   color: ${props => props.theme.primary};
   transition: 0.3s all ease-in-out;
-  padding: 5px 20px;
+  padding: 5px 10px;
   border-radius: 5px;
   border: 2px solid ${props => props.theme.primary};
   font-size: 1em;

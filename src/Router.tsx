@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { Link, Route, Switch, useLocation } from 'react-router-dom'
 import { animated, useTransition } from 'react-spring'
 import styled from "styled-components";
-import Landing from "./components/Landing";
-import Game from "./components/Game";
-import Challenges from "./components/Challenges";
-import Explanation from "./components/Walkthrough";
-import About from "./components/About";
+import Landing from "./screens/Landing";
+import Game from "./screens/Game";
+import Challenges from "./screens/Challenges";
+import Explanation from "./screens/Walkthrough";
+import About from "./screens/About";
 
 export default function Router () {
   const location = useLocation();

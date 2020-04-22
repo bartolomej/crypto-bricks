@@ -2,10 +2,10 @@ import styled from "styled-components";
 // @ts-ignore
 import UseAnimations from "react-useanimations";
 import React from "react";
-import { theme } from "./index";
+import { theme } from "../style";
 
 
-export function Loading () {
+export default function LoadingView () {
 
   const Container = styled.div`
     position: absolute;
