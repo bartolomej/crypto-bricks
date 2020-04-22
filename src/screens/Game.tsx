@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Modal from "../components/Modal";
 import ParamsView from "../components/ParamsView";
+import { Coin } from '../game/objects/Brick'
 
 
 type Transaction = {
@@ -32,7 +33,7 @@ export default function () {
     setTx((prev: any) => [...prev, { coin: prev[prev.length - 1].coin, incoming: false }]);
   }
 
-  function onScore (coin: string) {
+  function onScore (coin: Coin) {
     setTx((prev: any) => [...prev, { coin, incoming: true }]);
   }
 
@@ -101,10 +102,10 @@ export default function () {
               <StatsText>Total score: <span>{score}</span></StatsText>
             </TextWrapper>
             <TxWrapper>
-              {transactions.map((tx, i) => (
+              {transactions.map((tx: any, i) => (
                 <Transaction key={i} incoming={tx.incoming}>
-                  <CoinImg src={require(`../assets/${tx.coin}-white.png`)}/>
-                  <TxText>{tx.coin}</TxText>
+                  <CoinImg src={require(`../game/assets/${tx.coin.symbol.toLowerCase()}.png`)}/>
+                  <TxText>{tx.coin.symbol}</TxText>
                   <TxText>{tx.incoming ? '+ 1' : '- 1'}</TxText>
                 </Transaction>
               ))}

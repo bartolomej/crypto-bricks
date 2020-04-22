@@ -46,11 +46,11 @@ export default function Router () {
       THREE: THREE,
       color: 0xFFFFFF,
       backgroundColor: 0xFF0D1221
-    })
+    });
   }, [vantaRef])
 
   return (
-    <Container ref={vantaRef}>
+    <Container useVanta={location.pathname !== '/play'} ref={vantaRef}>
       {headerTransitions.map(({ item, key, props }) =>
         item && (
           <Header key={key} style={props}>
@@ -77,13 +77,14 @@ export default function Router () {
   )
 }
 
-const Container = styled.div`
+const Container = styled.div<any>`
   width: 100vw;
   height: 100vh;
   background: ${props => props.theme.dark};
   .vanta-canvas {
     opacity: 0.3;
     filter: blur(2px);
+    ${props => props.useVanta ? '' : 'display: none;'};
   }
 `;
 
@@ -102,10 +103,14 @@ const Header = styled(animated.div)`
 
 const HLink = styled(Link)<any>`
   font-weight: bold;
+  transition: 0.5s all ease-in-out;
   color: ${props => props.isCurrent 
-    ? props.theme.vibrant 
+    ? props.theme.primary 
     : props.theme.light
   };
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 
 const Page = styled(animated.div)`

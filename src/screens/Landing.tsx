@@ -47,6 +47,7 @@ const Icon = styled.img<any>`
   border-radius: 50%;
   animation: float 6s ease-in-out infinite;
   animation-delay: ${props => props.delay}s;
+  box-shadow: 0 5px 15px 0 ${props => colorWithOpacity(props.theme.light, 0.3)};
   @keyframes float {
     0% {
       box-shadow: 0 5px 15px 0 ${props => colorWithOpacity(props.theme.light, 0.3)};

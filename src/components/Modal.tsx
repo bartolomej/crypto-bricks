@@ -45,7 +45,7 @@ const Container = styled(animated.div)`
   justify-content: center;
   align-items: center;
   z-index: 20;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
 `;
 
 const InnerWrapper = styled.div`

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './style.css';
 import Main from "./Main";
+import { Coin } from "./objects/Brick";
 
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
   onMissed: Function;
   onFinished: Function;
   onStart: Function;
-  onScore: (coin: string) => void;
+  onScore: (coin: Coin) => void;
   gameRef?: any;
 }
 

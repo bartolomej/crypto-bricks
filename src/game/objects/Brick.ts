@@ -1,7 +1,6 @@
 import Vector from "../base/Vector";
 import Circle from "../base/Circle";
-
-const coins = ['btc', 'eth', 'mkr'];
+import coins from '../assets/manifest.json';
 
 function randomCoin () {
   const rand = Math.floor(Math.random() * coins.length);
@@ -13,11 +12,17 @@ enum BrickStatus {
   HIT
 }
 
+export type Coin = {
+  symbol: string;
+  name: string;
+  color: string;
+}
+
 export default class Brick extends Circle {
 
   private domElement: HTMLElement | null;
   private status: BrickStatus;
-  public coin: string;
+  public coin: Coin;
 
   constructor (radius: number, position: Vector) {
     super(radius, position);
@@ -39,7 +44,7 @@ export default class Brick extends Circle {
     container.style.bottom = `${this.position.y - this.radius}px`;
     container.style.left = `${this.position.x - this.radius}px`;
     const image = document.createElement('img');
-    image.src = require(`../../assets/${this.coin}-white.png`);
+    image.src = require(`../assets/${this.coin.symbol.toLowerCase()}.png`);
     container.appendChild(image);
     this.domElement = container;
     return container;
@@ -50,8 +55,6 @@ export default class Brick extends Circle {
     this.domElement?.classList.add('brick-disappear');
   }
 
-  update () {
-
-  }
+  update () {}
 
 }
