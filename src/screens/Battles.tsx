@@ -50,13 +50,13 @@ export default function () {
   return (
     <>
       <NavigationRow>
-        <NavLink to="/challenges">
+        <NavLink to="/battles">
           Open
         </NavLink>
-        <NavLink to="/challenges">
+        <NavLink to="/battles">
           Closed
         </NavLink>
-        <NavLink to="/challenges">
+        <NavLink to="/battles">
           Create
         </NavLink>
       </NavigationRow>
