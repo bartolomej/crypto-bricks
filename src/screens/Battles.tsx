@@ -15,7 +15,7 @@ export default function () {
   const contract: any = React.useRef();
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'development') {
       initWeb3().then(() => setLoading(false));
     } else {
       setError(new Error('This feature is still under development. Come back later 🤙.'))

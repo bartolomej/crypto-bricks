@@ -1,6 +1,13 @@
-# Crypto Bricks
+<div align="center">
+    <img width="200" height="200" src="./public/logo.png" alt="CryptoBricks"> 
+    <br> 
+    <br>
+    <h1>CryptoBricks</h1>
+    <br>
+    <br>
+</div>
 
-Fun little game in development for a school project.
+A little game that interacts with Ethereum network. Developed for a school project.
 
 ## Getting started
 - [Ethereum resources](https://ethereum.org/developers/#getting-started)

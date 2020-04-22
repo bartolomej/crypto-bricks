@@ -1,6 +1,6 @@
 :root {
     --dark: rgb(13, 18, 33);
-    --primary: rgba(81, 222, 210, 1);
+    --primary: rgb(81, 222, 210);
     --vibrant: rgba(217, 3, 104, 1);
     --darkish: rgba(38, 64, 139, 1);
     --light: rgba(255, 255, 255, 1);
