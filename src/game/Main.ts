@@ -18,6 +18,7 @@ type Props = {
   onStart: Function;
   playerSize?: number;
   bulletSize?: number;
+  velocity: number;
 }
 
 export default class Main {
@@ -26,23 +27,38 @@ export default class Main {
   private player!: Player;
   private bullet!: Bullet;
   private bricks!: Array<Array<Brick>>;
-  private readonly rows: number;
-  private readonly columns: number;
+  private rows: number;
+  private columns: number;
   private readonly domElement: HTMLElement;
   private state: GameState;
   private readonly onScore: Function;
   private readonly onMissed: Function;
   private borderPadding: number;
   private brickPadding: number;
-  private readonly bulletSize: number;
-  private readonly playerSize: number;
+  private bulletSize: number;
+  private playerSize: number;
   private readonly onStart: Function;
+  private velocity: number;
+  private bricksWrapperDom: HTMLDivElement;
+  private enableInteraction: boolean;
 
-  constructor ({ container, rows, columns, onMissed, onScore, bulletSize, playerSize, onStart }: Props) {
+  constructor ({
+    container,
+    rows,
+    columns,
+    onMissed,
+    onScore,
+    bulletSize,
+    playerSize,
+    onStart,
+    velocity
+  }: Props) {
     this.onScore = onScore;
     this.onMissed = onMissed;
     this.onStart = onStart;
+    this.velocity = velocity;
     this.domElement = container;
+    this.bricksWrapperDom = document.createElement('div');
     this.animation = null;
     this.rows = rows;
     this.columns = columns;
@@ -51,6 +67,29 @@ export default class Main {
     this.brickPadding = 10;
     this.bulletSize = bulletSize || 40;
     this.playerSize = playerSize || 150;
+    this.enableInteraction = true;
+    this.domElement.appendChild(this.bricksWrapperDom);
+  }
+
+  setPlayerSize (size: number) {
+    this.playerSize = size;
+    this.initializePlayer();
+  }
+
+  setBulletSize (size: number) {
+    this.bulletSize = size;
+    this.initializeBullet();
+  }
+
+  setBricksQuantity (rows: number, columns: number) {
+    this.rows = rows;
+    this.columns = columns;
+    this.initializeBricks();
+  }
+
+  setVelocity (v: number) {
+    this.velocity = v;
+    this.player.setVelocity(v * 2);
   }
 
   private getDimensions () {
@@ -75,26 +114,47 @@ export default class Main {
 
   initialize () {
     this.initializeBricks();
-    this.initializePlayerAndBall();
+    this.initializePlayer();
+    this.initializeBullet();
     this.requestAnimation();
     this.registerListeners();
   }
 
-  registerListeners () {
-    window.addEventListener('keydown', this.onKeyDown.bind(this));
+  async resetPlayerAndBall () {
+    this.player.setEnableInteraction(false);
+    this.enableInteraction = false;
+    await Promise.all([
+      this.bullet.setPosition(this.initialBulletPosition),
+      this.player.setPosition(this.initialPlayerPosition)
+    ]);
+    this.enableInteraction = true;
+    this.player.setEnableInteraction(true);
+  }
+
+  startGame () {
+    this.bullet.setVelocity(this.velocity);
+    this.bullet.setAngle((Math.random() * Math.PI / 2) + 1);
+    this.state = GameState.STARTED;
+    this.onStart();
+  }
+
+  resetRound () {
+    this.onMissed();
+    this.resetPlayerAndBall();
+    this.state = GameState.INITIAL;
+    this.bullet.velocity.y = 0;
   }
 
   destroy () {
     this.domElement.remove();
   }
 
-  onKeyDown (e: KeyboardEvent) {
-    if (e.code === 'Space' && this.state === GameState.INITIAL) {
-      this.startGame();
-    }
-  }
-
   initializeBricks () {
+    if (this.bricksWrapperDom.hasChildNodes()) {
+      this.domElement.removeChild(this.bricksWrapperDom);
+      this.bricksWrapperDom = document.createElement('div');
+      this.domElement.appendChild(this.bricksWrapperDom);
+    }
     const bricks = [];
     const { borderPadding, brickPadding } = this;
     const bW = this.brickWidth;
@@ -110,46 +170,41 @@ export default class Main {
       bricks.push(row);
     }
     this.bricks = bricks;
-    this.domElement.append(...this.bricks.flat(2).map(e => e.render()))
+    this.bricksWrapperDom.append(...this.bricks.flat(2).map(e => e.render()))
   }
 
-  initializePlayerAndBall () {
+  initializePlayer () {
     if (this.player) {
       this.player.removeDom();
-    }
-    if (this.bullet) {
-      this.bullet.removeDom();
     }
     this.player = new Player({
       width: this.playerSize,
       position: this.initialPlayerPosition,
-      speed: 20
+      speed: this.velocity,
     });
+    this.player.render(this.domElement);
+  }
+
+  initializeBullet () {
+    if (this.bullet) {
+      this.bullet.removeDom();
+    }
     this.bullet = new Bullet(
       this.bulletSize / 2,
       this.initialBulletPosition
     );
-    this.player.render(this.domElement);
     this.bullet.render(this.domElement);
   }
 
-  resetPlayerAndBall () {
-    this.player.setPositionAnimated(this.initialPlayerPosition);
-    this.bullet.setPositionAnimated(this.initialBulletPosition);
+  registerListeners () {
+    window.addEventListener('keydown', this.onKeyDown.bind(this));
   }
 
-  startGame () {
-    this.bullet.velocity.y = 8;
-    this.bullet.velocity.angle = (Math.random() * Math.PI / 2) + 1;
-    this.state = GameState.STARTED;
-    this.onStart();
-  }
-
-  resetRound () {
-    this.onMissed();
-    this.resetPlayerAndBall();
-    this.state = GameState.INITIAL;
-    this.bullet.velocity.y = 0;
+  onKeyDown (e: KeyboardEvent) {
+    if (!this.enableInteraction) return;
+    if (e.code === 'Space' && this.state === GameState.INITIAL) {
+      this.startGame();
+    }
   }
 
   requestAnimation () {
@@ -158,7 +213,7 @@ export default class Main {
     }
   }
 
-  gameLoop (time: number) {
+  gameLoop () {
     // compute brick-bullet collisions and response
     for (let i = 0; i < this.bricks.length; i++) {
       for (let j = 0; j < this.bricks[i].length; j++) {
@@ -173,15 +228,11 @@ export default class Main {
 
     // compute player border collisions
     if (this.player.collision(0)) {
-      this.player.bounceRight();
       this.player.updateRightPosition();
     } else if (this.player.collision(this.getDimensions().x)) {
-      this.player.bounceLeft();
-      this.player.updateLeftPosition()
+      this.player.updateLeftPosition();
     } else {
-      this.player.updateVelocity();
-      this.player.updateLeftPosition()
-      this.player.updateRightPosition();
+      this.player.updatePosition();
     }
 
     // compute top border bounce
@@ -215,8 +266,8 @@ export default class Main {
     }
 
     // update and redraw objects
-    this.player.update(time);
-    this.bullet.update(time);
+    this.player.update();
+    this.bullet.update();
 
     requestAnimationFrame(this.gameLoop.bind(this));
   }

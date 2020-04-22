@@ -5,24 +5,35 @@ export default class Brick extends Circle {
 
   private domElement: HTMLElement | null;
   velocity: Vector;
-  private parent: HTMLElement|null;
+  private parent: HTMLElement | null;
 
   constructor (radius: number, position: Vector) {
     super(radius, position);
-    this.velocity = new Vector(0,0);
+    this.velocity = new Vector(0, 0);
     this.domElement = null;
     this.parent = null;
   }
 
-  setPositionAnimated(pos: Vector) {
-    if (!this.domElement) return;
-    const duration = 1;
-    this.domElement.style.transition = `all ${duration}s ease-in-out`;
-    this.position = pos;
-    setTimeout(() => {
+  setVelocity (v: number) {
+    this.velocity.y = v;
+  }
+
+  setAngle (theta: number) {
+    this.velocity.angle = theta;
+  }
+
+  async setPosition (pos: Vector) {
+    return new Promise(resolve => {
       if (!this.domElement) return;
-      this.domElement.style.transition = '';
-    }, duration * 1000)
+      const duration = 1;
+      this.domElement.style.transition = `all ${duration}s ease-in-out`;
+      this.position = pos;
+      setTimeout(() => {
+        if (!this.domElement) return;
+        this.domElement.style.transition = '';
+        return resolve();
+      }, duration * 1000)
+    })
   }
 
   reflectHorizontal () {
@@ -46,8 +57,8 @@ export default class Brick extends Circle {
     const container = document.createElement('div');
     container.className = 'bullet';
     container.style.position = 'absolute';
-    container.style.height = `${this.radius*2}px`;
-    container.style.width = `${this.radius*2}px`;
+    container.style.height = `${this.radius * 2}px`;
+    container.style.width = `${this.radius * 2}px`;
     this.domElement = container;
     this.parent = parent;
     this.parent.appendChild(container);
@@ -59,7 +70,7 @@ export default class Brick extends Circle {
     }
   }
 
-  update (time: number) {
+  update () {
     if (!this.domElement) return;
 
     this.position.add(this.velocity);

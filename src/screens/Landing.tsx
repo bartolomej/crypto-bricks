@@ -32,7 +32,7 @@ export default function () {
         <LinkButton to="/play">
           <span>Just Play</span>
         </LinkButton>
-        <LinkButton to="/walkthrough">
+        <LinkButton to="/battles">
           <span>Take Challenge</span>
         </LinkButton>
       </ActionsWrapper>

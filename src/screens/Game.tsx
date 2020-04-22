@@ -18,6 +18,12 @@ export default function () {
   const [time, setTime]: any = useState(0);
   const [int, setInt]: any = useState(null);
   const [showModal, setShowModal]: any = useState(false);
+  // game parameters state
+  const [rows, setRows]: any = useState(2);
+  const [columns, setColumns]: any = useState(20);
+  const [velocity, setVelocity]: any = useState(8);
+  const [playerSize, setPlayerSize]: any = useState(150);
+  const [bulletSize, setBulletSize]: any = useState(40);
 
   useEffect(() => () => int && clearInterval(int), []);
 
@@ -36,7 +42,8 @@ export default function () {
   }
 
   function onReset () {
-
+    setRows(4)
+    setShowModal(true);
   }
 
   const score = transactions.length > 0
@@ -49,25 +56,34 @@ export default function () {
     <>
       <Modal show={showModal} onClose={() => setShowModal(false)}>
         <Title>Game parameters</Title>
-        <ParamsView/>
-        <Button onClick={console.log}>
-          Submit
-        </Button>
+        <ParamsView
+          columns={columns}
+          totalBricks={rows * columns}
+          onTotalBricksChange={total => setRows(total / columns)}
+          bulletSize={bulletSize}
+          onBulletSizeChange={setBulletSize}
+          playerSize={playerSize}
+          onPlayerSizeChange={setPlayerSize}
+          velocity={velocity}
+          onVelocityChange={setVelocity}
+        />
       </Modal>
       <GameWrapper>
         <Game
-          rows={2}
-          columns={20}
+          rows={rows}
+          columns={columns}
           onMissed={onMissed}
           onScore={onScore}
           onStart={onStart}
           width={gameWidth}
           height={gameHeight}
+          playerSize={playerSize}
+          bulletSize={bulletSize}
+          velocity={velocity}
         />
         <StatsContainer h={gameHeight}>
           <Section>
             <TextWrapper>
-              <Title>Your stats</Title>
               <StatsText>Elapsed time: <b>{time}s</b></StatsText>
               <StatsText>Total score: <b>{score}</b></StatsText>
             </TextWrapper>
@@ -82,10 +98,7 @@ export default function () {
             </TxWrapper>
             <ControlsWrapper>
               <Button onClick={onReset}>
-                Post challenge
-              </Button>
-              <Button onClick={() => setShowModal(true)}>
-                Reset
+                Settings
               </Button>
             </ControlsWrapper>
           </Section>
@@ -132,9 +145,10 @@ const ControlsWrapper = styled.div`
 
 const TextWrapper = styled.div`
   display: flex;
-  flex: 2;
+  flex: 1;
   flex-direction: column;
   align-items: center;
+  margin: 15px 0;
 `;
 
 const TxWrapper = styled.div`

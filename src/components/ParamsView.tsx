@@ -9,7 +9,29 @@ import { theme } from "../style";
 // @ts-ignore
 const Handle = Slider.Handle;
 
-export default function ParamsView () {
+type Props = {
+  columns: number;
+  totalBricks: number;
+  onTotalBricksChange: (n: number) => void;
+  bulletSize: number;
+  onBulletSizeChange: (n: number) => void;
+  velocity: number;
+  onVelocityChange: (n: number) => void;
+  playerSize: number;
+  onPlayerSizeChange: (n: number) => void;
+}
+
+export default function ParamsView ({
+  columns,
+  totalBricks,
+  onTotalBricksChange,
+  bulletSize,
+  onBulletSizeChange,
+  velocity,
+  onVelocityChange,
+  playerSize,
+  onPlayerSizeChange
+}: Props) {
 
   const handle = ({ value, dragging, index, ...restProps }: any) => {
     return (
@@ -34,58 +56,59 @@ export default function ParamsView () {
         <SliderWrapper>
           <Slider
             trackStyle={trackStyle}
-            min={0}
-            max={20}
-            defaultValue={3}
-            handle={handle}
+            min={20}
+            max={100}
+            defaultValue={bulletSize}
+            handle={props => {
+              onBulletSizeChange(props.value);
+              return handle(props);
+            }}
           />
         </SliderWrapper>
       </FieldWrapper>
       <FieldWrapper>
-        <InputText>Bullet velocity</InputText>
+        <InputText>Bullet and Player velocity</InputText>
         <SliderWrapper>
           <Slider
             trackStyle={trackStyle}
-            min={0}
-            max={20}
-            defaultValue={3}
-            handle={handle}
+            min={2}
+            max={28}
+            defaultValue={velocity}
+            handle={props => {
+              onVelocityChange(props.value);
+              return handle(props);
+            }}
           />
         </SliderWrapper>
       </FieldWrapper>
       <FieldWrapper>
-        <InputText>Player acceleration</InputText>
+        <InputText>Player pad size</InputText>
         <SliderWrapper>
           <Slider
             trackStyle={trackStyle}
-            min={0}
-            max={20}
-            defaultValue={3}
-            handle={handle}
+            min={60}
+            max={250}
+            defaultValue={playerSize}
+            handle={props => {
+              onPlayerSizeChange(props.value);
+              return handle(props);
+            }}
           />
         </SliderWrapper>
       </FieldWrapper>
       <FieldWrapper>
-        <InputText>Player pad width</InputText>
+        <InputText>Number of bricks</InputText>
         <SliderWrapper>
           <Slider
             trackStyle={trackStyle}
-            min={0}
-            max={20}
-            defaultValue={3}
-            handle={handle}
-          />
-        </SliderWrapper>
-      </FieldWrapper>
-      <FieldWrapper>
-        <InputText>Number of target bricks</InputText>
-        <SliderWrapper>
-          <Slider
-            trackStyle={trackStyle}
-            min={0}
-            max={20}
-            defaultValue={3}
-            handle={handle}
+            min={20}
+            max={200}
+            step={columns}
+            defaultValue={totalBricks}
+            handle={props => {
+              onTotalBricksChange(props.value);
+              return handle(props);
+            }}
           />
         </SliderWrapper>
       </FieldWrapper>

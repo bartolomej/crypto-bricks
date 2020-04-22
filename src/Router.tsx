@@ -4,7 +4,7 @@ import { animated, useTransition } from 'react-spring'
 import styled from "styled-components";
 import Landing from "./screens/Landing";
 import Game from "./screens/Game";
-import Challenges from "./screens/Challenges";
+import Challenges from "./screens/Battles";
 import Explanation from "./screens/Walkthrough";
 import About from "./screens/About";
 
@@ -43,7 +43,7 @@ export default function Router () {
           <Header key={key} style={props}>
             <HeaderLink to={'/'} text={'Home'} />
             <HeaderLink to={'/walkthrough'} text={'Walkthrough'} />
-            <HeaderLink to={'/challenge'} text={'Challenges'} />
+            <HeaderLink to={'/battles'} text={'Battles'} />
             <HeaderLink to={'/play'} text={'Play'} />
             <HeaderLink to={'/about'} text={'About'} />
           </Header>
@@ -54,7 +54,7 @@ export default function Router () {
           <Switch location={location}>
             <Route path="/" exact component={Landing}/>
             <Route path="/walkthrough" component={Explanation}/>
-            <Route path="/challenge" component={Challenges}/>
+            <Route path="/battles" component={Challenges}/>
             <Route path="/play" component={Game}/>
             <Route path="/about" component={About}/>
           </Switch>
