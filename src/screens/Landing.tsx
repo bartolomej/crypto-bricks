@@ -6,13 +6,9 @@ import btc from "../assets/btc-white.png";
 // @ts-ignore
 import mkr from "../assets/mkr-white.png";
 import styled from "styled-components";
-// @ts-ignore
-import UseAnimations from "react-useanimations";
-import { colorWithOpacity } from "../index";
 import { Link } from "react-router-dom";
+import { colorWithOpacity } from "../style";
 
-
-// TODO: https://vincentgarreau.com/particles.js/
 
 export default function () {
 
@@ -24,9 +20,7 @@ export default function () {
           src={eth}
           delay={"1"}
         />
-        <Icon
-          src={btc}
-        />
+        <Icon src={btc} />
         <Icon
           transform="rotate(20deg)"
           src={mkr}
@@ -34,10 +28,14 @@ export default function () {
         />
       </div>
       <Title>Crypto Bricks</Title>
-      <LinkButton to="/game">
-        <span>Start</span>
-        <UseAnimations animationKey="arrowDown" size={30}/>
-      </LinkButton>
+      <ActionsWrapper>
+        <LinkButton to="/play">
+          <span>Just Play</span>
+        </LinkButton>
+        <LinkButton to="/battles">
+          <span>Take Challenge</span>
+        </LinkButton>
+      </ActionsWrapper>
     </>
   )
 }
@@ -70,15 +68,21 @@ const Title = styled.h1`
   color: ${props => props.theme.vibrant};
 `;
 
+const ActionsWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
 const LinkButton = styled(Link)`
   display: flex;
   flex-direction: column;
   align-items: center;
   color: ${props => props.theme.light};
-  transition: 0.6s all ease-in-out;
+  transition: 0.3s all ease-in-out;
+  margin: 0 40px;
+  padding: 5px 20px;
   span {
-    text-transform: uppercase;
-    font-size: 2em;
+    font-size: 1.2em;
     font-weight: bold;
   }
   &:hover {

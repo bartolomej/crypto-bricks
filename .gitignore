@@ -10,7 +10,7 @@
 
 # production
 /build
-/contract/build
+/src/web3/build
 
 # misc
 .DS_Store
@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 /src/react-app-env.d.ts
 .idea
+
+.env

@@ -6,37 +6,34 @@ import Bullet from "./Bullet";
 type Props = {
   width: number;
   position: number;
-  acceleration?: number | null;
-  speed?: number | null;
+  speed?: number;
 }
 
 export default class Player {
 
   private domElement: HTMLDivElement | null;
-  private readonly width: number;
+  private width: number;
   private readonly height: number;
   velocity: number;
   position: number;
   private parent: HTMLElement | null;
-  private rightKeyDown: boolean;
-  private leftKeyDown: boolean;
-  private readonly acceleration: number | null | undefined;
-  private readonly constantVelocity: number | null;
   private readonly bottomPadding: number;
+  private moveRight: boolean;
+  private moveLeft: boolean;
+  private enableInteraction: boolean;
 
-  constructor ({ width, position, acceleration = null, speed = null }: Props) {
+  constructor ({ width, position, speed = 1 }: Props) {
     this.height = 15;
     this.bottomPadding = 8;
     this.width = width;
     this.position = position;
-    this.velocity = 0;
-    this.constantVelocity = speed;
-    this.acceleration = acceleration;
+    this.velocity = speed;
     this.domElement = null;
     this.parent = null;
-    this.rightKeyDown = false;
-    this.leftKeyDown = false;
     this.registerListeners();
+    this.moveRight = false;
+    this.moveLeft = false;
+    this.enableInteraction = true;
   }
 
   private getCorners () {
@@ -46,42 +43,31 @@ export default class Player {
     return { left, right };
   }
 
-  setPositionAnimated(pos: number) {
-    if (!this.domElement) return;
-    const duration = 1;
-    this.domElement.style.transition = `all ${duration}s ease-in-out`;
-    this.position = pos;
-    setTimeout(() => {
+  // sets horizontal position with animation
+  async setPosition (pos: number) {
+    return new Promise(resolve => {
       if (!this.domElement) return;
-      this.domElement.style.transition = '';
-    }, duration * 1000)
+      const duration = 1;
+      this.domElement.style.transition = `all ${duration}s ease-in-out`;
+      this.position = pos;
+      setTimeout(() => {
+        if (!this.domElement) return;
+        this.domElement.style.transition = '';
+        return resolve();
+      }, duration * 1000)
+    });
+  }
+
+  setEnableInteraction(enable: boolean) {
+    this.enableInteraction = enable;
+  }
+
+  setVelocity (v: number) {
+    this.velocity = v;
   }
 
   getHeight () {
     return this.height + this.bottomPadding + 5;
-  }
-
-  registerListeners () {
-    window.addEventListener('keydown', this.onKeyDown.bind(this))
-    window.addEventListener('keyup', this.onKeyUp.bind(this))
-  }
-
-  onKeyDown (e: KeyboardEvent) {
-    if (e.code === 'ArrowLeft') {
-      this.leftKeyDown = true;
-    }
-    if (e.code === 'ArrowRight') {
-      this.rightKeyDown = true;
-    }
-  }
-
-  onKeyUp (e: KeyboardEvent) {
-    if (e.code === 'ArrowLeft') {
-      this.leftKeyDown = false;
-    }
-    if (e.code === 'ArrowRight') {
-      this.rightKeyDown = false;
-    }
   }
 
   bounceLeft () {
@@ -123,6 +109,56 @@ export default class Player {
     }
   }
 
+  updateRightPosition () {
+    if (this.moveRight) {
+      this.position += this.velocity;
+    }
+  }
+
+  updateLeftPosition () {
+    if (this.moveLeft) {
+      this.position -= this.velocity;
+    }
+  }
+
+  updatePosition () {
+    this.updateLeftPosition();
+    this.updateRightPosition();
+  }
+
+  update () {
+    if (!this.domElement) return;
+    this.domElement.style.left = `${this.position - this.width / 2}px`;
+  }
+
+  registerListeners () {
+    window.addEventListener('keydown', this.onKeyDown.bind(this))
+    window.addEventListener('keyup', this.onKeyUp.bind(this))
+  }
+
+  onKeyDown (e: KeyboardEvent) {
+    if (!this.enableInteraction) {
+      this.moveRight = false;
+      this.moveLeft = false;
+      return;
+    }
+    if (e.code === 'ArrowRight') {
+      this.moveRight = true;
+    }
+    if (e.code === 'ArrowLeft') {
+      this.moveLeft = true;
+    }
+  }
+
+  onKeyUp (e: KeyboardEvent) {
+    if (e.code === 'ArrowLeft') {
+      this.moveLeft = false;
+    }
+    if (e.code === 'ArrowRight') {
+      this.moveRight = false;
+    }
+  }
+
   render (parent: HTMLElement) {
     const container = document.createElement('div');
     container.className = 'player';
@@ -139,43 +175,6 @@ export default class Player {
     if (this.domElement && this.parent) {
       this.parent.removeChild(this.domElement);
     }
-  }
-
-  updateVelocity () {
-    // check if initialized as constant velocity movement
-    if (!this.acceleration) return;
-
-    if (this.leftKeyDown) {
-      this.velocity -= this.acceleration;
-    }
-    if (this.rightKeyDown) {
-      this.velocity += this.acceleration;
-    }
-  }
-
-  updateRightPosition () {
-    if (this.constantVelocity) {
-      if (this.rightKeyDown) {
-        this.position += this.constantVelocity;
-      }
-    }
-  }
-
-  updateLeftPosition () {
-    if (this.constantVelocity) {
-      if (this.leftKeyDown) {
-        this.position -= this.constantVelocity;
-      }
-    }
-  }
-
-  update (time: number) {
-    if (!this.domElement) return;
-
-    if (this.acceleration) {
-      this.position += this.velocity;
-    }
-    this.domElement.style.left = `${this.position - this.width / 2}px`;
   }
 
 }

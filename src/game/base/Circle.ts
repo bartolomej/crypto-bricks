@@ -10,6 +10,10 @@ export default class Circle {
     this.position = position;
   }
 
+  setRadius (r: number) {
+    this.radius = r;
+  }
+
   distance (c: Circle) {
     return Math.sqrt(
       (c.position.x - this.position.x) ** 2 +
