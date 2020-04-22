@@ -6,13 +6,9 @@ import btc from "../assets/btc-white.png";
 // @ts-ignore
 import mkr from "../assets/mkr-white.png";
 import styled from "styled-components";
-// @ts-ignore
-import UseAnimations from "react-useanimations";
 import { colorWithOpacity } from "../index";
 import { Link } from "react-router-dom";
 
-
-// TODO: https://vincentgarreau.com/particles.js/
 
 export default function () {
 
@@ -36,12 +32,10 @@ export default function () {
       <Title>Crypto Bricks</Title>
       <ActionsWrapper>
         <LinkButton to="/play">
-          <span>Start</span>
-          <UseAnimations animationKey="arrowDown" size={30}/>
+          <span>Just Play</span>
         </LinkButton>
-        <LinkButton to="/challenge">
-          <span>Challenges</span>
-          <UseAnimations animationKey="arrowDown" size={30}/>
+        <LinkButton to="/walkthrough">
+          <span>Take Challenge</span>
         </LinkButton>
       </ActionsWrapper>
     </>
@@ -85,15 +79,16 @@ const LinkButton = styled(Link)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: ${props => props.theme.light};
-  transition: 0.6s all ease-in-out;
+  color: ${props => props.theme.primary};
+  transition: 0.3s all ease-in-out;
+  margin: 0 40px;
+  padding: 5px 20px;
   span {
-    text-transform: uppercase;
-    font-size: 2em;
+    font-size: 1.2em;
     font-weight: bold;
   }
   &:hover {
-    color: ${props => props.theme.primary};
+    color: ${props => props.theme.vibrant};
     transform: scale(1.2);
   }
 `;
