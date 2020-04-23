@@ -11,8 +11,9 @@ const Handle = Slider.Handle;
 
 type Props = {
   columns: number;
-  totalBricks: number;
-  onTotalBricksChange: (n: number) => void;
+  onColumnsChange: (n: number) => void;
+  rows: number;
+  onRowsChange: (n: number) => void;
   bulletSize: number;
   onBulletSizeChange: (n: number) => void;
   velocity: number;
@@ -23,8 +24,9 @@ type Props = {
 
 export default function ParamsView ({
   columns,
-  totalBricks,
-  onTotalBricksChange,
+  onColumnsChange,
+  rows,
+  onRowsChange,
   bulletSize,
   onBulletSizeChange,
   velocity,
@@ -67,6 +69,21 @@ export default function ParamsView ({
         </SliderWrapper>
       </FieldWrapper>
       <FieldWrapper>
+        <InputText>Player size</InputText>
+        <SliderWrapper>
+          <Slider
+            trackStyle={trackStyle}
+            min={60}
+            max={250}
+            defaultValue={playerSize}
+            handle={props => {
+              onPlayerSizeChange(props.value);
+              return handle(props);
+            }}
+          />
+        </SliderWrapper>
+      </FieldWrapper>
+      <FieldWrapper>
         <InputText>Bullet and Player velocity</InputText>
         <SliderWrapper>
           <Slider
@@ -82,31 +99,32 @@ export default function ParamsView ({
         </SliderWrapper>
       </FieldWrapper>
       <FieldWrapper>
-        <InputText>Player pad size</InputText>
+        <InputText>Brick columns</InputText>
         <SliderWrapper>
           <Slider
             trackStyle={trackStyle}
-            min={60}
-            max={250}
-            defaultValue={playerSize}
+            min={5}
+            max={40}
+            step={1}
+            defaultValue={columns}
             handle={props => {
-              onPlayerSizeChange(props.value);
+              onColumnsChange(props.value);
               return handle(props);
             }}
           />
         </SliderWrapper>
       </FieldWrapper>
       <FieldWrapper>
-        <InputText>Number of bricks</InputText>
+        <InputText>Brick rows</InputText>
         <SliderWrapper>
           <Slider
             trackStyle={trackStyle}
-            min={20}
-            max={200}
-            step={columns}
-            defaultValue={totalBricks}
+            min={1}
+            max={10}
+            step={1}
+            defaultValue={rows}
             handle={props => {
-              onTotalBricksChange(props.value);
+              onRowsChange(props.value);
               return handle(props);
             }}
           />

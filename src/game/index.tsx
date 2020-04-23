@@ -11,6 +11,7 @@ type Props = {
   columns: number;
   bulletSize: number;
   playerSize: number;
+  playerCoin: string;
   velocity: number;
   onMissed: Function;
   onFinished: Function;
@@ -31,7 +32,8 @@ export default function ({
   onStart,
   velocity,
   bulletSize,
-  playerSize
+  playerSize,
+  playerCoin
 }: Props) {
   const container: any = React.useRef();
   const game: any = React.useRef();
@@ -48,7 +50,8 @@ export default function ({
       velocity,
       bulletSize,
       playerSize,
-      onFinished
+      onFinished,
+      playerCoin
     });
     game.current.initialize();
     if (gameRef) {

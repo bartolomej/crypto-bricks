@@ -42,7 +42,11 @@
 
 .player {
     background: var(--primary);
-    border-radius: 10px;
+    border-radius: 50%;
+}
+
+.player img {
+    height: 100%;
 }
 
 .bullet {

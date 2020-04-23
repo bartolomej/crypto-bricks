@@ -1,32 +1,34 @@
 import Circle from "../base/Circle";
 import Vector from "../base/Vector";
-import Bullet from "./Bullet";
 
+
+const coins = ['btc', 'eth', 'mkr'];
 
 type Props = {
   width: number;
   position: number;
   speed?: number;
+  coin: string;
 }
 
-export default class Player {
+export default class Player extends Circle {
 
   private domElement: HTMLDivElement | null;
   private width: number;
   private readonly height: number;
   velocity: number;
-  position: number;
   private parent: HTMLElement | null;
   private readonly bottomPadding: number;
   private moveRight: boolean;
   private moveLeft: boolean;
   private enableInteraction: boolean;
+  private coin: string;
 
-  constructor ({ width, position, speed = 1 }: Props) {
+  constructor ({ width, position, speed = 1, coin }: Props) {
+    super(width / 2, new Vector(position, width / 2));
     this.height = 15;
     this.bottomPadding = 8;
     this.width = width;
-    this.position = position;
     this.velocity = speed;
     this.domElement = null;
     this.parent = null;
@@ -34,22 +36,16 @@ export default class Player {
     this.moveRight = false;
     this.moveLeft = false;
     this.enableInteraction = true;
-  }
-
-  private getCorners () {
-    const r = this.height / 2;
-    const left = new Circle(r, new Vector(this.position - (this.width / 2) + r, r));
-    const right = new Circle(r, new Vector(this.position + (this.width / 2) - r, r));
-    return { left, right };
+    this.coin = coin;
   }
 
   // sets horizontal position with animation
-  async setPosition (pos: number) {
+  async setPositionAnimated (pos: number) {
     return new Promise(resolve => {
       if (!this.domElement) return;
       const duration = 1;
       this.domElement.style.transition = `all ${duration}s ease-in-out`;
-      this.position = pos;
+      super.setPosition(new Vector(pos, this.radius));
       setTimeout(() => {
         if (!this.domElement) return;
         this.domElement.style.transition = '';
@@ -58,7 +54,7 @@ export default class Player {
     });
   }
 
-  setEnableInteraction(enable: boolean) {
+  setEnableInteraction (enable: boolean) {
     this.enableInteraction = enable;
   }
 
@@ -67,7 +63,7 @@ export default class Player {
   }
 
   getHeight () {
-    return this.height + this.bottomPadding + 5;
+    return this.radius * 2 + this.bottomPadding + 5;
   }
 
   bounceLeft () {
@@ -78,46 +74,15 @@ export default class Player {
     this.velocity = Math.abs(this.velocity) * 0.8;
   }
 
-  collision (x: number) {
-    return Math.sqrt((x - this.position) ** 2) <= this.width / 2;
-  }
-
-  // only checks vertical collision
-  // implemented for our special case
-  intersects (bullet: Circle) {
-    const d = bullet.position.y - (this.height / 2);
-    if (
-      (bullet.position.x) >= this.position - this.width / 2 &&
-      (bullet.position.x) <= this.position + this.width / 2 &&
-      d < bullet.radius + ((this.height + this.bottomPadding) / 2)
-    ) {
-      return true;
-    }
-  }
-
-  intersectsCorners (bullet: Circle) {
-    const { left, right } = this.getCorners();
-    return right.intersects(bullet) || left.intersects(bullet);
-  }
-
-  cornerIntersection (source: Bullet) {
-    const { left, right } = this.getCorners();
-    if (left.distance(source) < right.distance(source)) {
-      return source.bounceVelocity(left);
-    } else {
-      return source.bounceVelocity(right);
-    }
-  }
-
   updateRightPosition () {
     if (this.moveRight) {
-      this.position += this.velocity;
+      this.position.x += this.velocity;
     }
   }
 
   updateLeftPosition () {
     if (this.moveLeft) {
-      this.position -= this.velocity;
+      this.position.x -= this.velocity;
     }
   }
 
@@ -128,7 +93,7 @@ export default class Player {
 
   update () {
     if (!this.domElement) return;
-    this.domElement.style.left = `${this.position - this.width / 2}px`;
+    this.domElement.style.left = `${this.position.x - this.radius}px`;
   }
 
   registerListeners () {
@@ -160,14 +125,10 @@ export default class Player {
   }
 
   render (parent: HTMLElement) {
-    const container = document.createElement('div');
-    container.className = 'player';
-    container.style.position = 'absolute';
-    container.style.bottom = this.bottomPadding + 'px';
-    container.style.height = `${this.height}px`;
-    container.style.width = `${this.width}px`;
-    this.domElement = container;
+    const image = require(`../assets/${this.coin}-color.png`);
+    const container = super.createElement('player', image);
     this.parent = parent;
+    this.domElement = container;
     this.parent.appendChild(container);
   }
 

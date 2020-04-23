@@ -54,11 +54,7 @@ export default class Brick extends Circle {
   }
 
   render (parent: HTMLElement) {
-    const container = document.createElement('div');
-    container.className = 'bullet';
-    container.style.position = 'absolute';
-    container.style.height = `${this.radius * 2}px`;
-    container.style.width = `${this.radius * 2}px`;
+    const container = super.createElement('bullet');
     this.domElement = container;
     this.parent = parent;
     this.parent.appendChild(container);

@@ -1,6 +1,6 @@
 import Vector from "../base/Vector";
 import Circle from "../base/Circle";
-import coins from '../assets/manifest.json';
+import coins from '../assets/bricks/manifest.json';
 
 function randomCoin () {
   const rand = Math.floor(Math.random() * coins.length);
@@ -36,16 +36,8 @@ export default class Brick extends Circle {
   }
 
   render () {
-    const container = document.createElement('div');
-    container.className = 'brick';
-    container.style.height = `${this.radius * 2}px`;
-    container.style.width = `${this.radius * 2}px`;
-    container.style.position = 'absolute';
-    container.style.bottom = `${this.position.y - this.radius}px`;
-    container.style.left = `${this.position.x - this.radius}px`;
-    const image = document.createElement('img');
-    image.src = require(`../assets/${this.coin.symbol.toLowerCase()}.png`);
-    container.appendChild(image);
+    const image = require(`../assets/bricks/${this.coin.symbol.toLowerCase()}.png`);
+    const container = super.createElement('brick', image)
     this.domElement = container;
     return container;
   }

@@ -18,6 +18,7 @@ type Props = {
   onFinished: Function;
   onStart: Function;
   playerSize?: number;
+  playerCoin?: string;
   bulletSize?: number;
   velocity: number;
 }
@@ -45,6 +46,7 @@ export default class Main {
   private scoredBricks: number;
   private readonly onFinish: Function;
   private running: boolean;
+  private playerCoin: any;
 
   constructor ({
     container,
@@ -56,7 +58,8 @@ export default class Main {
     playerSize,
     onStart,
     onFinished,
-    velocity
+    velocity,
+    playerCoin
   }: Props) {
     this.onScore = onScore;
     this.onMissed = onMissed;
@@ -77,6 +80,7 @@ export default class Main {
     this.domElement.appendChild(this.bricksWrapperDom);
     this.scoredBricks = 0;
     this.running = false;
+    this.playerCoin = playerCoin;
   }
 
   setEnableInteraction (enable: boolean) {
@@ -105,6 +109,14 @@ export default class Main {
     this.player.setVelocity(v * 2);
   }
 
+  setPause (pause: boolean) {
+    if (pause) {
+      this.stopAnimation();
+    } else {
+      this.startAnimation();
+    }
+  }
+
   private getDimensions () {
     return {
       x: this.domElement.clientWidth,
@@ -121,7 +133,7 @@ export default class Main {
   }
 
   private get initialBulletPosition () {
-    return new Vector(this.player.position, this.player.getHeight() + this.bulletSize / 2);
+    return new Vector(this.player.position.x, this.player.getHeight() + this.bulletSize/4);
   }
 
   private get brickWidth () {
@@ -142,7 +154,7 @@ export default class Main {
     this.enableInteraction = false;
     await Promise.all([
       this.bullet.setPosition(this.initialBulletPosition),
-      this.player.setPosition(this.initialPlayerPosition)
+      this.player.setPositionAnimated(this.initialPlayerPosition)
     ]);
     this.enableInteraction = true;
     this.player.setEnableInteraction(true);
@@ -214,6 +226,7 @@ export default class Main {
       width: this.playerSize,
       position: this.initialPlayerPosition,
       speed: this.velocity,
+      coin: this.playerCoin || 'eth'
     });
     this.player.render(this.domElement);
   }
@@ -273,9 +286,9 @@ export default class Main {
     }
 
     // compute player border collisions
-    if (this.player.collision(0)) {
+    if (this.player.intersectsLine(0)) {
       this.player.updateRightPosition();
-    } else if (this.player.collision(this.getDimensions().x)) {
+    } else if (this.player.intersectsLine(this.getDimensions().x)) {
       this.player.updateLeftPosition();
     } else {
       this.player.updatePosition();
@@ -296,14 +309,12 @@ export default class Main {
 
     // compute if player bounced the bullet
     if (this.player.intersects(this.bullet)) {
-      this.bullet.reflectVertical();
-    } else if (this.player.intersectsCorners(this.bullet)) {
-      this.bullet.velocity = this.player.cornerIntersection(this.bullet);
+      this.bullet.velocity = this.bullet.bounceVelocity(this.player);
     }
 
     // set horizontal bullet collision equal to player's if game hasn't started
     if (this.state === GameState.INITIAL) {
-      this.bullet.position.x = this.player.position;
+      this.bullet.position.x = this.player.position.x;
     }
 
     // check if bullet hit the ground

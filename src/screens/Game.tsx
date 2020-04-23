@@ -4,7 +4,7 @@ import styled from "styled-components";
 import Modal from "../components/Modal";
 import ParamsView from "../components/ParamsView";
 import { Coin } from '../game/objects/Brick'
-
+import { useInterval } from 'beautiful-react-hooks';
 
 type Transaction = {
   coin: string;
@@ -19,21 +19,32 @@ export default function () {
   const txWrapper: any = React.useRef();
   const [transactions, setTx]: [Array<Transaction>, any] = useState([]);
   const [time, setTime]: any = useState(0);
-  const [int, setInt]: any = useState(null);
-  const [showModal, setShowModal]: any = useState(false);
+  const [running, setRunning]: any = useState(false);
+  const [level, setLevel]: any = useState(1);
+  const [showSettings, setShowSettings]: any = useState(false);
+  const [showTutorial, setShowTutorial]: any = useState(false);
+  const [showSuccess, setShowSuccess]: any = useState(false);
   // game parameters state
-  const [rows, setRows]: any = useState(2);
-  const [columns, setColumns]: any = useState(20);
+  const [rows, setRows]: any = useState(1);
+  const [columns, setColumns]: any = useState(5);
   const [velocity, setVelocity]: any = useState(8);
   const [playerSize, setPlayerSize]: any = useState(150);
   const [bulletSize, setBulletSize]: any = useState(40);
 
-  useEffect(() => () => {
-    int && clearInterval(int)
-  }, []);
+  useInterval(() => {
+    if (running) setTime(1 + time);
+  }, 1000);
   useEffect(() => {
     txWrapper.current.scrollTop = 0
   }, [transactions]);
+  useEffect(() => {
+    setTimeout(() => setShowTutorial(true), 1500);
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space') {
+        setShowTutorial(false);
+      }
+    })
+  }, []);
 
   function onMissed () {
     setTx((prev: any) => [...prev, { coin: prev[prev.length - 1].coin, incoming: false }]);
@@ -44,27 +55,38 @@ export default function () {
   }
 
   function onFinished () {
-    console.log('finished');
+    gameRef.current.setPause(true);
+    setRunning(false);
+    setShowSuccess(true);
+  }
+
+  function onNextLevel () {
+    gameRef.current.reset();
+    gameRef.current.setPause(false);
+    setTime(0);
+    setLevel(level + 1);
+    setColumns(columns + 3);
+    setRows(level % 2 === 0 ? rows + 1 : rows);
+    setShowSuccess(false);
   }
 
   function onStart () {
-    setInt(setInterval(() => {
-      setTime((prev: number) => prev + 1);
-    }, 1000));
+    setRunning(true);
+    setTime(0);
   }
 
   function onSettings () {
-    gameRef.current.stopAnimation();
-    setShowModal(true);
+    gameRef.current.setPause(true);
+    setShowSettings(true);
   }
 
   function onCloseSettings () {
-    gameRef.current.startAnimation();
-    setShowModal(false)
+    gameRef.current.setPause(false);
+    setShowSettings(false)
   }
 
   function onReset () {
-    clearInterval(int);
+    onStart();
     setTx([]);
     setTime(0);
     gameRef.current.reset();
@@ -78,12 +100,13 @@ export default function () {
 
   return (
     <>
-      <Modal show={showModal} onClose={onCloseSettings}>
+      <Modal show={showSettings} onClose={onCloseSettings}>
         <Title>Game settings</Title>
         <ParamsView
+          rows={rows}
+          onRowsChange={setRows}
           columns={columns}
-          totalBricks={rows * columns}
-          onTotalBricksChange={total => setRows(total / columns)}
+          onColumnsChange={setColumns}
           bulletSize={bulletSize}
           onBulletSizeChange={setBulletSize}
           playerSize={playerSize}
@@ -91,6 +114,21 @@ export default function () {
           velocity={velocity}
           onVelocityChange={setVelocity}
         />
+      </Modal>
+      <Modal show={showSuccess} onClose={onCloseSettings}>
+        <Title>Level finished!</Title>
+        <StatsText>Time: <span>{time}s</span></StatsText>
+        <Button onClick={onNextLevel}>Continue</Button>
+      </Modal>
+      <Modal show={showTutorial} onClose={onCloseSettings}>
+        <Title>How to play</Title>
+        <StatsText>
+          Use <span>LEFT</span> and <span>RIGHT</span>arrows for movement.
+        </StatsText>
+        <StatsText>
+          Press <span>SPACE</span> to start playing.
+        </StatsText>
+        <Button onClick={() => setShowTutorial(false)}>Okey</Button>
       </Modal>
       <GameWrapper>
         <Game
@@ -103,6 +141,7 @@ export default function () {
           onStart={onStart}
           width={gameWidth}
           height={gameHeight}
+          playerCoin={'eth'}
           playerSize={playerSize}
           bulletSize={bulletSize}
           velocity={velocity}
@@ -110,13 +149,14 @@ export default function () {
         <StatsContainer h={gameHeight}>
           <Section>
             <TextWrapper>
+              <StatsText>Level: <span>{level}</span></StatsText>
               <StatsText>Elapsed time: <span>{time}s</span></StatsText>
               <StatsText>Total score: <span>{score}</span></StatsText>
             </TextWrapper>
             <TxWrapper ref={txWrapper}>
               {transactions.map((tx: any, i) => (
                 <Transaction key={i} incoming={tx.incoming}>
-                  <CoinImg src={require(`../game/assets/${tx.coin.symbol.toLowerCase()}.png`)}/>
+                  <CoinImg src={require(`../game/assets/bricks/${tx.coin.symbol.toLowerCase()}.png`)}/>
                   <TxText>{tx.coin.symbol}</TxText>
                   <TxText>{tx.incoming ? '+ 1' : '- 1'}</TxText>
                 </Transaction>
@@ -202,7 +242,7 @@ const StatsText = styled.span`
   span {
     display: inline-block;
     font-weight: bold;
-    width: 30px;
+    min-width: 30px;
   }
 `;
 
