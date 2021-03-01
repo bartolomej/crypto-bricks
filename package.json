@@ -20,7 +20,7 @@
     "react-spring": "8.0.27",
     "react-useanimations": "1.2.13",
     "styled-components": "5.1.0",
-    "three": "0.115.0",
+    "three": "0.125.0",
     "typescript": "~3.7.2",
     "vanta": "0.5.14",
     "web3": "1.2.6"
